@@ -1,107 +1,138 @@
+// obj to hold the pad info
 let obj = {};
-
+// indx to hold our place in the txt
+let indx = 0;
+//pad to hold the link to the pad
+let pad;
 
 function setup() {
   createCanvas(windowWidth, windowHeight*0.5);
 
-
+  // set pad url here (maybe in a ui though?). ad `/expot/txt` to get it as a txt file.
     //<yourdomain>.com/p/<yourpad>/export/txt
+    pad = "https://pad.vvvvvvaria.org/visuals/export/txt"
     
+    // call the main pad text fetch + turn to object function
+    getPadData();
 
-    var mdDoc = readListFromFile( "https://pad.vvvvvvaria.org/visuals/export/txt");
-    console.log(obj.section_1.styling.background);
+    // trying to get it to recursively update from the pad but no luck yet.<<<
+    //setInterval(getPadData, 500 );
+    
 }
 
 function draw() {
-  background(int(obj.section_1.styling.background));
-  color(255);
-  let i=0
-  obj.section_1.text.forEach(line => {
-    i++;
-    text(line, 50, 50*i +50)
-  });
+  // draw the bg from the object
+  background(int(obj.section_1.styling.background), 5);
+  fill(255,10);
+  textSize(30);
+  // write current indexed text
+  text(obj.section_1.text[indx], 50, 50)
   
 }
 
-function readStringFromFileAtPath(pathOfFileToReadFrom)
+// using mouse clicked to test index changing
+function mouseClicked() { 
+nxtIndx();
+} 
+
+// loops over the text indx
+function nxtIndx(){
+  indx++
+  if (obj.section_1.text.length<=indx){
+    indx=0;
+  }
+}
+
+// randomly selects index
+function randIndx(){
+  indx= int(random(obj.section_1.text.length));
+}
+
+// main fetching function
+function getPadData()
 {
+    // gets request for pad as txt
     var request = new XMLHttpRequest();
-    request.open("GET", pathOfFileToReadFrom, false);
+    request.open("GET", pad, false);
     request.send(null);
     var returnValue = request.responseText;
 
-    return returnValue;
+    // passes the text to be processed into obj
+    md2obj(returnValue);
+
 }
 
-
-function readListFromFile(pathOfFileToReadFrom)
+function md2obj(md)
 {
-    var request = new XMLHttpRequest();
-    request.open("GET", pathOfFileToReadFrom, false);
-    request.send(null);
-    var returnValue = request.responseText;
-    break2headings(returnValue);
-
-    return obj;
-}
-
-function break2headings(md)
-{
-
+  // splits the md file into lines
   md = md.match(/(#+.*)|([^!?;.\n]+.)/g).map(v=>v.trim());
-
-  console.log(md);
-
-
+  // var to keep track of heading level
   let headingLvl = 0;
+  // array to keep a list of current heading hierarchies
   let headings = [];
 
+  //loop over md file lines
   md.forEach(mdDoc => {
+    // if blank return
     if (mdDoc === "") {return}
-    let numHashes = (mdDoc.split("#").length - 1)
-    if(numHashes>0){
-      mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
-      if(headingLvl<numHashes){
-        headingLvl++;
-        headings.push(mdDoc);
 
+    // check the num of hashes in title
+    let numHashes = (mdDoc.split("#").length - 1)
+    // if num # is greater than 0 (its a heading)
+    if(numHashes>0){
+      // clean up title by removing #, making lower case and replacing spaces with _
+      mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
+      // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
+      if(headingLvl<numHashes){
+        // adds a level
+        headingLvl++;
+        // add name of heading to list
+        headings.push(mdDoc);
       }
       else if(headingLvl==numHashes){
+        // change name of last heading in the list
         headings[headings.length - 1] = mdDoc
       }
       else if (headingLvl>=numHashes){
+        // go back a level of heading
         headingLvl--;
+        // remove a vlue from the list
         headings.pop();
+        // replace the last heading in the list
         headings[headings.length - 1] = mdDoc
 
       }
     }
-    else{
-      let thisData = obj;
-      for (let h = 0; h < headings.length; h++) {
-          console.log(h)
-          console.log(thisData);
-          if (h==headings.length-1){
-            if(headings[h] == 'styling'){
-              if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
-              mdDoc = mdDoc.split(':');
-              thisData[headings[h]][mdDoc[0].trim()] = mdDoc[1].trim();
-            }
-            else{
-              if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
-              thisData[headings[h]].push(mdDoc);
-            }
+    else{ // it is a value and we add it to the obj
 
-            
-            console.log(thisData);
+      let thisData = obj;
+      // loop over the current heading level
+      for (let h = 0; h < headings.length; h++) {
+
+        if (h==headings.length-1){ // if it is the last heading in the list add the data
+          if(headings[h] == 'styling'){ // if heading is styling
+            // make an object if it doesn't exist
+            if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
+            // split the data by the colon :
+            mdDoc = mdDoc.split(':');
+            // set the key and value from the two pairs.
+            thisData[headings[h]][mdDoc[0].trim()] = mdDoc[1].trim();
           }
           else{
-            if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
-            thisData = thisData[headings[h]];
+            // for unlabled create a list if not there
+            if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
+            // and add the value to it.
+            thisData[headings[h]].push(mdDoc);
           }
+        }
+        else{// else go into that next layer of the obj
+          // if the next layer doesn't exist make it
+          if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
+          // move thisData into it.
+          thisData = thisData[headings[h]];
+        }
       }
     }
-
     
   });
 
