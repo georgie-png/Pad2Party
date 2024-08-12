@@ -3,14 +3,19 @@ let obj = {};
 // indx to hold our place in the txt
 let indx = 0;
 //pad to hold the link to the pad
-let pad;
+let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
+
+const interval = setInterval(function() {
+  getPadData();
+  console.log(0);
+}, 10000);
 
 function setup() {
   createCanvas(windowWidth, windowHeight*0.5);
 
   // set pad url here (maybe in a ui though?). ad `/expot/txt` to get it as a txt file.
     //<yourdomain>.com/p/<yourpad>/export/txt
-    pad = "https://pad.vvvvvvaria.org/visuals/export/txt"
+    //pad = "https://pad.vvvvvvaria.org/visuals/export/txt"
     
     // call the main pad text fetch + turn to object function
     getPadData();
