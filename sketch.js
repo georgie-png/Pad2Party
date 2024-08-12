@@ -14,6 +14,7 @@ function setup() {
     
     // call the main pad text fetch + turn to object function
     getPadData();
+    console.log(obj);
 
     // trying to get it to recursively update from the pad but no luck yet.<<<
     //setInterval(getPadData, 500 );
@@ -22,11 +23,13 @@ function setup() {
 
 function draw() {
   // draw the bg from the object
-  background(int(obj.section_1.styling.background), 5);
+  background(int(obj.section_2.styling.background), 5);
   fill(255,10);
-  textSize(30);
+  //textSize(int(obj.section_2.styling.textsize));
+  window["textSize"](int(obj.section_2.styling.textsize));
   // write current indexed text
-  text(obj.section_1.text[indx], 50, 50)
+  text(obj.section_2.text[indx], 50, 50);
+  
   
 }
 
@@ -38,14 +41,14 @@ nxtIndx();
 // loops over the text indx
 function nxtIndx(){
   indx++
-  if (obj.section_1.text.length<=indx){
+  if (obj.section_2.text.length<=indx){
     indx=0;
   }
 }
 
 // randomly selects index
 function randIndx(){
-  indx= int(random(obj.section_1.text.length));
+  indx= int(random(obj.section_2.text.length));
 }
 
 // main fetching function
