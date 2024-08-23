@@ -9,4 +9,7 @@
 - [ ] Take multiple inputs for styling/other settings splitting by commas
 - [ ] Get it to recursively update from the pad
 - [ ] Beat detection
-- [ ] Using npm in js (1. sliders 2.draggables->can be maximise/ minimise) 
+- [ ] Using npm in js (1. sliders 2.draggables->can be maximise/ minimise)
+
+
+Test [HERE](https://georgie-png.github.io/etherpad-vis/)
