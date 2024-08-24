@@ -5,6 +5,10 @@ mermaid.initialize({
   // formatting of text like this
 // "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
 
+ //let mermaidText = "stateDiagram-v2\n    ";
+
+    //mermaidText += text[i] + " --> " + text[randI] + "\n    ";
+
   eleM = document.querySelector('.mermaid');
   eleE = document.querySelector('#err');
 
