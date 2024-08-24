@@ -1,5 +1,5 @@
 # Notes
-- [ ] Making styling dynamic
+- [X] Making styling dynamic
 - [ ] Making UI ex: buttons, default page for input to name the pad 
 - [ ] Settings header (radomness)
 - [ ] Adding custom fonts

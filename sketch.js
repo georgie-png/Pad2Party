@@ -7,7 +7,7 @@ let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
 const interval = setInterval(function() {
   getPadData();
-  console.log(0);
+  console.log("request pad");
 }, 10000);
 
 function setup() {
@@ -19,7 +19,7 @@ function setup() {
     
     // call the main pad text fetch + turn to object function
     getPadData();
-    console.log(obj);
+    //console.log(obj);
 
     // trying to get it to recursively update from the pad but no luck yet.<<<
     //setInterval(getPadData, 500 );
@@ -27,14 +27,31 @@ function setup() {
 }
 
 function draw() {
-  // draw the bg from the object
-  background(int(obj.section_2.styling.background), 5);
-  fill(255,10);
-  //textSize(int(obj.section_2.styling.textsize));
-  window["textSize"](int(obj.section_2.styling.textsize));
-  // write current indexed text
-  text(obj.section_2.text[indx], 50, 50);
+
+  let stylingKeys = Object.keys(obj.section_2.styling);
+  let numKeys = stylingKeys.length;
   
+  for (let k = 0; k < numKeys; k++) {
+    let key = stylingKeys[k];
+    if (window[key] !== undefined){
+      
+      window[key](obj.section_2.styling[key]);
+      console.log(key)
+
+    }
+
+    
+  }
+
+  // draw the bg from the object
+  //background(int(obj.section_2.styling.background), 5);
+  //fill(255,10);
+  //textSize(int(obj.section_2.styling.textsize));
+  //window["textSize"](int(obj.section_2.styling.textsize));
+  // write current indexed text
+  window['textAlign'](CENTER);
+
+  text(obj.section_2.text[indx], width*0.5, height*0.5);
   
 }
 
@@ -123,8 +140,13 @@ function md2obj(md)
             if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
             // split the data by the colon :
             mdDoc = mdDoc.split(':');
+
+            let func = mdDoc[0].trim;
+            let val = mdDoc[1].trim;
+
+            if (isNumeric(val)){val = int(val);}
             // set the key and value from the two pairs.
-            thisData[headings[h]][mdDoc[0].trim()] = mdDoc[1].trim();
+            thisData[headings[h]][func] = val;
           }
           else{
             // for unlabled create a list if not there
@@ -144,4 +166,8 @@ function md2obj(md)
     
   });
 
+}
+
+function isNumeric(num){
+  return !isNaN(num)
 }

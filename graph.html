@@ -1,0 +1,12 @@
+<script>
+    VAR1 = 1;
+    VAR2 = 2;
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+  <button onclick="mermaidDraw()">render</button>
+  <textarea>flowchart LR
+  A["`var1=${VAR1}`"] -->|"{VAR2}"| B("{VAR3}")</textarea>
+  <div class="mermaid"></div>
+  <pre id="err"></pre>
+
+  <script src="mermaid.js">  </script>
