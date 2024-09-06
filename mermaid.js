@@ -51,16 +51,20 @@ mermaid.initialize({
           lastnode++;
         }); 
         
-        for (let i=0 ; i<2 ; i++){
-          let from = randIndx();
-          let to = randIndx();
-          text += getRandomInt().toString() + " --> " + getRandomInt().toString() + "\n " ;
+        for (let i=0 ; i<6 ; i++){
+          let from = getRandomInt();
+          let to = getRandomInt();
+          if(from==to && Math.random()>0.5){
+            if(to==0){to++}
+            else{to--}
+          }
+          text += from.toString() + " --> " + to.toString() + "\n " ;
         }
         
         // get text from pad
         //text = mermaidText + "[*]"+ " --> " + obj.section_2.text[0] + "\n    " + obj.section_2.text[0]+ " --> " + '[*]' + "\n    "+ obj.section_2.text[0]+ " --> " + obj.section_2.text[1]+ "\n    "+ obj.section_2.text[1] + " --> " +obj.section_2.text[0]+ "\n    "+obj.section_2.text[1] + " --> " +obj.section_2.text[2]+ "\n    "+obj.section_2.text[1]+ " --> "+"[*]";
         console.log(JSON.stringify(text));
-        console.log(obj);
+        //console.log(obj);
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
