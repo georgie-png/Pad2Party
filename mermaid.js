@@ -50,7 +50,12 @@ mermaid.initialize({
 
           lastnode++;
         }); 
-
+        
+        for (let i=0 ; i<2 ; i++){
+          let from = randIndx();
+          let to = randIndx();
+          text += getRandomInt().toString() + " --> " + getRandomInt().toString() + "\n " ;
+        }
         
         // get text from pad
         //text = mermaidText + "[*]"+ " --> " + obj.section_2.text[0] + "\n    " + obj.section_2.text[0]+ " --> " + '[*]' + "\n    "+ obj.section_2.text[0]+ " --> " + obj.section_2.text[1]+ "\n    "+ obj.section_2.text[1] + " --> " +obj.section_2.text[0]+ "\n    "+obj.section_2.text[1] + " --> " +obj.section_2.text[2]+ "\n    "+obj.section_2.text[1]+ " --> "+"[*]";
@@ -101,7 +106,12 @@ function nxtIndx(){
 
 // randomly selects index
 function randIndx(){
-  indx= int(random(obj.section_2.text.length));
+  indx= int(random(obj.section_2.text.length - 1));
+  return indx;
+}
+
+function getRandomInt() {
+  return Math.floor(Math.random() * obj.section_2.text.length);
 }
 
 // main fetching function
