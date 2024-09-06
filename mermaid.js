@@ -5,7 +5,7 @@ let indx = 0;
 //pad to hold the link to the pad
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
- let mermaidText = "stateDiagram-v2\n    ";
+ let mermaidText = "flowchart TD\n ";
 
 
 const interval = setInterval(function() {
@@ -35,9 +35,25 @@ mermaid.initialize({
     try {
         // get text from input
         //text2 = document.querySelector('textarea').value;
+        let lastnode = 0
+        text = mermaidText
+        obj.section_2.text.forEach((item) => {
+          if(lastnode==0){
+            text += lastnode.toString() + "[" + item+ "]" + " --> ";
+          }
+          else if (lastnode ==1){
+            text += lastnode.toString() + "[" + item+ "]" + "\n " ;
+          }
+          else{
+            text += (lastnode-1).toString() + " --> " + lastnode.toString() + "[" + item+ "]" + "\n " ;
+          }
+
+          lastnode++;
+        }); 
+
         
         // get text from pad
-        text = mermaidText + "[*]"+ " --> " + obj.section_2.text[0] + "\n    " + obj.section_2.text[0]+ " --> " + '[*]' + "\n    "+ obj.section_2.text[0]+ " --> " + obj.section_2.text[1]+ "\n    "+ obj.section_2.text[1] + " --> " +obj.section_2.text[0]+ "\n    "+obj.section_2.text[1] + " --> " +obj.section_2.text[2]+ "\n    "+obj.section_2.text[1]+ " --> "+"[*]";
+        //text = mermaidText + "[*]"+ " --> " + obj.section_2.text[0] + "\n    " + obj.section_2.text[0]+ " --> " + '[*]' + "\n    "+ obj.section_2.text[0]+ " --> " + obj.section_2.text[1]+ "\n    "+ obj.section_2.text[1] + " --> " +obj.section_2.text[0]+ "\n    "+obj.section_2.text[1] + " --> " +obj.section_2.text[2]+ "\n    "+obj.section_2.text[1]+ " --> "+"[*]";
         console.log(JSON.stringify(text));
         console.log(obj);
         // check it is a valid graph
