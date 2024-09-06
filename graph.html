@@ -4,8 +4,14 @@
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
   <button onclick="mermaidDraw()">render</button>
-  <textarea>flowchart LR
-  A["`var1=${VAR1}`"] -->|"{VAR2}"| B("{VAR3}")</textarea>
+  <textarea>stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]</textarea>
   <div class="mermaid"></div>
   <pre id="err"></pre>
 
