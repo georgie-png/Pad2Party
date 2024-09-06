@@ -6,13 +6,17 @@ let indx = 0;
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
  let mermaidText = "flowchart LR\n ";
- let arrowTypes = [" -.-> ", " ==> ", " ~~~ "]
+ let arrowTypes = [" -->" ," -.-> ", " ==> ", " ~~~ "]
+
+ let section = "";
+ let numSections = 0;
+ let secIndx = 0
 
 
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
-}, 10000);
+}, 20000);
 
 getPadData();
 mermaid.initialize({
@@ -34,12 +38,15 @@ mermaid.initialize({
   // main function called by button 
   async function mermaidDraw() {
 
+    changeSection();
+    
+
     try {
         // get text from input
         //text2 = document.querySelector('textarea').value;
         let lastnode = 0
         text = mermaidText
-        obj.section_2.text.forEach((item) => {
+        obj[section].text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           if(lastnode==0){
             text += lastnode.toString() + "[" + item+ "]" + arrow;
@@ -66,9 +73,8 @@ mermaid.initialize({
         }
         
         // get text from pad
-        //text = mermaidText + "[*]"+ " --> " + obj.section_2.text[0] + "\n    " + obj.section_2.text[0]+ " --> " + '[*]' + "\n    "+ obj.section_2.text[0]+ " --> " + obj.section_2.text[1]+ "\n    "+ obj.section_2.text[1] + " --> " +obj.section_2.text[0]+ "\n    "+obj.section_2.text[1] + " --> " +obj.section_2.text[2]+ "\n    "+obj.section_2.text[1]+ " --> "+"[*]";
-        console.log(JSON.stringify(text));
-        //console.log(obj);
+        //console.log(JSON.stringify(text));
+        console.log(Object.keys(obj).length);
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
@@ -107,7 +113,7 @@ mermaid.initialize({
 
 
 function getRandomInt() {
-  return Math.floor(Math.random() * obj.section_2.text.length);
+  return Math.floor(Math.random() * obj[section].text.length);
 }
 
 // main fetching function
@@ -203,7 +209,20 @@ function md2obj(md)
     }
     
   });
+  let keys = Object.keys(obj);
+  numSections = keys.length;
+  section = keys[secIndx];
 
+
+
+}
+
+function changeSection(){
+  let keys = Object.keys(obj);
+  numSections = keys.length;
+  secIndx++;
+  if(numSections<=secIndx){secIndx=0;}
+  section = keys[secIndx];
 }
 
 function isNumeric(num){
