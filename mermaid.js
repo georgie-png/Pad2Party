@@ -5,7 +5,8 @@ let indx = 0;
 //pad to hold the link to the pad
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
- let mermaidText = "flowchart TD\n ";
+ let mermaidText = "flowchart LR\n ";
+ let arrowTypes = [" -.-> ", " ==> ", " ~~~ "]
 
 
 const interval = setInterval(function() {
@@ -15,7 +16,8 @@ const interval = setInterval(function() {
 
 getPadData();
 mermaid.initialize({
-    startOnLoad: true
+    startOnLoad: true,
+    theme: 'base',
   });
 
   // formatting of text like this
@@ -27,7 +29,7 @@ mermaid.initialize({
   eleM = document.querySelector('.mermaid');
   eleE = document.querySelector('#err');
 
-  setTimeout(mermaidDraw, 200);
+  //setTimeout(mermaidDraw, 200);
 
   // main function called by button 
   async function mermaidDraw() {
@@ -38,27 +40,29 @@ mermaid.initialize({
         let lastnode = 0
         text = mermaidText
         obj.section_2.text.forEach((item) => {
+          let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           if(lastnode==0){
-            text += lastnode.toString() + "[" + item+ "]" + " --> ";
+            text += lastnode.toString() + "[" + item+ "]" + arrow;
           }
           else if (lastnode ==1){
             text += lastnode.toString() + "[" + item+ "]" + "\n " ;
           }
           else{
-            text += (lastnode-1).toString() + " --> " + lastnode.toString() + "[" + item+ "]" + "\n " ;
+            text += (lastnode-1).toString() + arrow + lastnode.toString() + "[" + item+ "]" + "\n " ;
           }
 
           lastnode++;
         }); 
         
-        for (let i=0 ; i<6 ; i++){
+        for (let i=0 ; i<12 ; i++){
+          let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let from = getRandomInt();
           let to = getRandomInt();
           if(from==to && Math.random()>0.5){
             if(to==0){to++}
             else{to--}
           }
-          text += from.toString() + " --> " + to.toString() + "\n " ;
+          text += from.toString() + arrow + to.toString() + "\n " ;
         }
         
         // get text from pad
@@ -100,19 +104,7 @@ mermaid.initialize({
     });
     return text;
   }
-  // loops over the text indx
-function nxtIndx(){
-  indx++
-  if (obj.section_2.text.length<=indx){
-    indx=0;
-  }
-}
 
-// randomly selects index
-function randIndx(){
-  indx= int(random(obj.section_2.text.length - 1));
-  return indx;
-}
 
 function getRandomInt() {
   return Math.floor(Math.random() * obj.section_2.text.length);
@@ -140,6 +132,7 @@ function md2obj(md)
   let headingLvl = 0;
   // array to keep a list of current heading hierarchies
   let headings = [];
+  obj = {};
 
   //loop over md file lines
   md.forEach(mdDoc => {
@@ -174,7 +167,7 @@ function md2obj(md)
       }
     }
     else{ // it is a value and we add it to the obj
-
+      
       let thisData = obj;
       // loop over the current heading level
       for (let h = 0; h < headings.length; h++) {
