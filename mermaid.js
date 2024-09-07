@@ -6,7 +6,7 @@ let indx = 0;
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
  let mermaidText = "flowchart LR\n ";
- let arrowTypes = [" -->" ," -.-> ", " ==> ", " ~~~ "]
+ let arrowTypes = [" -->" ," -.-> ", " ==> ", " ~~~ "," --o "," --x ","o--o", " <--> ", " x--x "]
 
  let section = "";
  let numSections = 0;
