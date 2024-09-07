@@ -46,8 +46,12 @@ mermaid.initialize({
         //text2 = document.querySelector('textarea').value;
         let lastnode = 0
         text = mermaidText
-        obj[section].text.forEach((item) => {
+        let thisSection = obj[section]
+        thisSection.text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
+          if(Math.random()>0.6){
+            arrow += "|" + thisSection.movement[Math.floor(Math.random()*thisSection.movement.length)] + "|";
+          }
           if(lastnode==0){
             text += lastnode.toString() + "[" + item+ "]" + arrow;
           }
@@ -70,6 +74,9 @@ mermaid.initialize({
             else{to--}
           }
           text += from.toString() + arrow + to.toString() + "\n " ;
+        }
+        for(let i =0; i<thisSection.text.length; i++){
+          text += "style " + i.toString() +" fill:#f9f,stroke:#333,stroke-width:4px"+ "\n ";
         }
         
         // get text from pad
@@ -179,25 +186,12 @@ function md2obj(md)
       for (let h = 0; h < headings.length; h++) {
 
         if (h==headings.length-1){ // if it is the last heading in the list add the data
-          if(headings[h] == 'styling'){ // if heading is styling
-            // make an object if it doesn't exist
-            if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
-            // split the data by the colon :
-            mdDoc = mdDoc.split(':');
 
-            let func = mdDoc[0].trim;
-            let val = mdDoc[1].trim;
-
-            if (isNumeric(val)){val = int(val);}
-            // set the key and value from the two pairs.
-            thisData[headings[h]][func] = val;
-          }
-          else{
             // for unlabled create a list if not there
             if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
             // and add the value to it.
             thisData[headings[h]].push(mdDoc);
-          }
+
         }
         else{// else go into that next layer of the obj
           // if the next layer doesn't exist make it
