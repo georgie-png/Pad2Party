@@ -5,18 +5,27 @@ let indx = 0;
 //pad to hold the link to the pad
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
+
  let mermaidText = "flowchart LR\n ";
  let arrowTypes = [" -->" ," -.-> ", " ==> ", " ~~~ "," --o "," --x ","o--o", " <--> ", " x--x "]
 
  let section = "";
  let numSections = 0;
  let secIndx = 0
+ navigator.getUserMedia = navigator.getUserMedia
+                                   || navigator.webkitGetUserMedia
+                                   || navigator.mozGetUserMedia;
 
+            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
 
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
 }, 20000);
+const randomHexColorCode = () => {
+  let n = (Math.random() * 0xfffff * 1000000).toString(16);
+  return '#' + n.slice(0, 6);
+};
 
 getPadData();
 mermaid.initialize({
@@ -76,7 +85,7 @@ mermaid.initialize({
           text += from.toString() + arrow + to.toString() + "\n " ;
         }
         for(let i =0; i<thisSection.text.length; i++){
-          text += "style " + i.toString() +" fill:#f9f,stroke:#333,stroke-width:4px"+ "\n ";
+          text += "style " + i.toString() +" fill:" + randomHexColorCode().toString() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
         
         // get text from pad
@@ -221,4 +230,36 @@ function changeSection(){
 
 function isNumeric(num){
   return !isNaN(num)
+}
+
+function callback(stream) {
+  var ctx = new AudioContext();
+  var mic = ctx.createMediaStreamSource(stream);
+  var analyser = ctx.createAnalyser();
+  mic.connect(analyser); 
+
+  var data = new Uint8Array(analyser.frequencyBinCount);
+
+  function play() {
+      analyser.getByteFrequencyData(data);
+
+      // get fullest bin
+      var idx = 0;
+      for (var j=0; j < analyser.frequencyBinCount; j++) {
+          if (data[j] > data[idx]) {
+              idx = j;
+          }
+      }
+
+      var frequency = idx * ctx.sampleRate / analyser.fftSize;
+      console.log(frequency);
+
+      requestAnimationFrame(play);
+      if(frequency>4000){
+        mermaidDraw();
+      }
+  }
+
+  play();
+
 }
