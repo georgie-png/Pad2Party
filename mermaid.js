@@ -7,7 +7,8 @@ let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
 
  let mermaidText = "flowchart LR\n ";
- let arrowTypes = [" -->" ," -.-> ", " ==> ", " ~~~ "," --o "," --x ","o--o", " <--> ", " x--x "]
+ let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
+ let nodeTypes = ['(_)' ,'([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))']
 
  let section = "";
  let numSections = 0;
@@ -58,17 +59,18 @@ mermaid.initialize({
         let thisSection = obj[section]
         thisSection.text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
+          let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
           if(Math.random()>0.6){
             arrow += "|" + thisSection.movement[Math.floor(Math.random()*thisSection.movement.length)] + "|";
           }
           if(lastnode==0){
-            text += lastnode.toString() + "[" + item+ "]" + arrow;
+            text += lastnode.toString() + node[0] + item+ node[1] + arrow;
           }
           else if (lastnode ==1){
-            text += lastnode.toString() + "[" + item+ "]" + "\n " ;
+            text += lastnode.toString() + node[0] + item+ node[1] + "\n " ;
           }
           else{
-            text += (lastnode-1).toString() + arrow + lastnode.toString() + "[" + item+ "]" + "\n " ;
+            text += (lastnode-1).toString() + arrow + lastnode.toString() + node[0] + item+ node[1] + "\n " ;
           }
 
           lastnode++;
@@ -85,12 +87,12 @@ mermaid.initialize({
           text += from.toString() + arrow + to.toString() + "\n " ;
         }
         for(let i =0; i<thisSection.text.length; i++){
-          text += "style " + i.toString() +" fill:" + randomHexColorCode().toString() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
+          text += "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
         
         // get text from pad
         //console.log(JSON.stringify(text));
-        console.log(Object.keys(obj).length);
+        //console.log(Object.keys(obj).length);
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
