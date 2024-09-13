@@ -6,3 +6,9 @@ html, body {
 canvas {
   display: block;
 }
+
+.mermaid svg { 
+  max-width: 100%; 
+  min-height: 500px;
+}
+
