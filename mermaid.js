@@ -5,6 +5,9 @@ let indx = 0;
 //pad to hold the link to the pad
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
+var osc = new OSC();
+osc.open(); // connect by default to ws://localhost:8080
+
 
  let mermaidText = "flowchart LR\n ";
  let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
@@ -89,7 +92,10 @@ mermaid.initialize({
         for(let i =0; i<thisSection.text.length; i++){
           text += "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
-        
+        var string = new OSC.Message('/text', thisSection.text.toString());
+        osc.send(string);
+        console.log(string);
+
         // get text from pad
         //console.log(JSON.stringify(text));
         //console.log(Object.keys(obj).length);
@@ -245,7 +251,7 @@ function callback(stream) {
   function play() {
       analyser.getByteFrequencyData(data);
 
-      // get fullest bin
+      // get fullest bin-
       var idx = 0;
       for (var j=0; j < analyser.frequencyBinCount; j++) {
           if (data[j] > data[idx]) {
@@ -254,7 +260,10 @@ function callback(stream) {
       }
 
       var frequency = idx * ctx.sampleRate / analyser.fftSize;
-      console.log(frequency);
+      // console.log(frequency);
+       var message = new OSC.Message('/frequency', frequency);
+       osc.send(message);
+
 
       requestAnimationFrame(play);
       if(frequency>4000){

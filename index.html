@@ -3,6 +3,7 @@
   <head>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/osc-js@2.4.1/lib/osc.min.js"></script>
     <style>
       .mermaid {width:100% !important}
       .mermaid svg {height:400px !important}
@@ -13,7 +14,18 @@
     <button onclick="mermaidDraw()">render</button>
     <div class="mermaid"></div>
     <pre id="err"></pre>
+
     <script src="mermaid.js">  </script>
+    <button id="send">Send Message</button>
+    
+    <script type="text/javascript">
+      var osc = new OSC();
+      osc.open(); // connect by default to ws://localhost:8080
+      document.getElementById('send').addEventListener('click', () => {
+        var message = new OSC.Message('/test/random', Math.random());
+        osc.send(message);
+      });
+    </script>
   </body>
 
   </html>
