@@ -22,7 +22,8 @@ let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
-}, 9000);
+}, 20000);
+
 const randomHexColorCode = () => {
   let n = (Math.random() * 0xfffff * 1000000).toString(16);
   return '#' + n.slice(0, 6);
@@ -91,7 +92,6 @@ mermaid.initialize({
         }
         
         // get text from pad
-        //console.log(JSON.stringify(text));
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
@@ -136,6 +136,7 @@ function getRandomInt() {
 // main fetching function
 function getPadData()
 {
+
     // gets request for pad as txt
     var request = new XMLHttpRequest();
     request.open("GET", pad, false);
@@ -144,6 +145,7 @@ function getPadData()
 
     // passes the text to be processed into obj
     md2obj(returnValue);
+
 
 }
 
@@ -156,8 +158,10 @@ function md2obj(md)
   // array to keep a list of current heading hierarchies
   let headings = [];
   //obj = {};
-  graph = {};
+  let graph = {};
   let graphList = [];
+
+
 
   //loop over md file lines
   md.forEach(mdDoc => {
@@ -170,6 +174,8 @@ function md2obj(md)
     if(numHashes>0){
       // clean up title by removing #, making lower case and replacing spaces with _
       mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
+      
+
       // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
       if(headingLvl<numHashes){
         // adds a level
@@ -188,9 +194,11 @@ function md2obj(md)
 
         if(headingLvl==1){
 
+
           if("text" in graph && "movement" in graph){
 
             obj[headings[0]] = graph;
+            
             graph = {};     
 
           }
@@ -199,34 +207,39 @@ function md2obj(md)
         headings.pop();
         // replace the last heading in the list
         headings[headings.length - 1] = mdDoc;
+      }
+      if(headingLvl==1){
         graphList.push(mdDoc);
+
       }
 
     }
     else{ // it is a value and we add it to the obj
       
-      //let thisData = graph;
+      let thisData = graph;
       // loop over the current heading level
       for (let h = 1; h < headings.length; h++) {
 
         if (h==headings.length-1){ // if it is the last heading in the list add the data
 
             // for unlabled create a list if not there
-            if(!(headings[h]in graph)){graph[headings[h]] = [];}
+            if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
             // and add the value to it.
-            graph[headings[h]].push(mdDoc);
+            thisData[headings[h]].push(mdDoc);
 
         }
         else{// else go into that next layer of the obj
           // if the next layer doesn't exist make it
-          if(!(headings[h]in graph)){graph[headings[h]] = {};}
+          if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
           // move thisData into it.
-          graph = graph[headings[h]];
+          thisData = thisData[headings[h]];
         }
       }
     }
     
   });
+
+
 
   if("text" in graph && "movement" in graph){
 
@@ -236,20 +249,21 @@ function md2obj(md)
   }
 
 
-
   let keys = Object.keys(obj);
   numSections = keys.length;
 
-  graphList.forEach(element => {
-    keys = keys.filter(a => a !== element)
-  });
-  
-  keys.forEach(key => {
+  keys2Del = keys.reduce((keys2Del, key) => {
+    if (graphList.indexOf(key) <= -1) {
+      keys2Del.push(key);
+    }
+    return keys2Del;
+}, []);
+
+  keys2Del.forEach(key => {
     delete obj[key];
   });
 
   section = keys[secIndx];
-  console.log(obj);
 
 
 
@@ -261,6 +275,7 @@ function changeSection(){
   secIndx++;
   if(numSections<=secIndx){secIndx=0;}
   section = keys[secIndx];
+
 }
 
 function isNumeric(num){
