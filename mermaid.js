@@ -22,7 +22,7 @@ let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
-}, 20000);
+}, 9000);
 const randomHexColorCode = () => {
   let n = (Math.random() * 0xfffff * 1000000).toString(16);
   return '#' + n.slice(0, 6);
@@ -92,7 +92,6 @@ mermaid.initialize({
         
         // get text from pad
         //console.log(JSON.stringify(text));
-        //console.log(Object.keys(obj).length);
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
@@ -156,7 +155,9 @@ function md2obj(md)
   let headingLvl = 0;
   // array to keep a list of current heading hierarchies
   let headings = [];
-  obj = {};
+  //obj = {};
+  graph = {};
+  let graphList = [];
 
   //loop over md file lines
   md.forEach(mdDoc => {
@@ -181,42 +182,74 @@ function md2obj(md)
         headings[headings.length - 1] = mdDoc
       }
       else if (headingLvl>=numHashes){
+
         // go back a level of heading
         headingLvl--;
+
+        if(headingLvl==1){
+
+          if("text" in graph && "movement" in graph){
+
+            obj[headings[0]] = graph;
+            graph = {};     
+
+          }
+        }
         // remove a vlue from the list
         headings.pop();
         // replace the last heading in the list
-        headings[headings.length - 1] = mdDoc
-
+        headings[headings.length - 1] = mdDoc;
+        graphList.push(mdDoc);
       }
+
     }
     else{ // it is a value and we add it to the obj
       
-      let thisData = obj;
+      //let thisData = graph;
       // loop over the current heading level
-      for (let h = 0; h < headings.length; h++) {
+      for (let h = 1; h < headings.length; h++) {
 
         if (h==headings.length-1){ // if it is the last heading in the list add the data
 
             // for unlabled create a list if not there
-            if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
+            if(!(headings[h]in graph)){graph[headings[h]] = [];}
             // and add the value to it.
-            thisData[headings[h]].push(mdDoc);
+            graph[headings[h]].push(mdDoc);
 
         }
         else{// else go into that next layer of the obj
           // if the next layer doesn't exist make it
-          if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
+          if(!(headings[h]in graph)){graph[headings[h]] = {};}
           // move thisData into it.
-          thisData = thisData[headings[h]];
+          graph = graph[headings[h]];
         }
       }
     }
     
   });
+
+  if("text" in graph && "movement" in graph){
+
+    obj[headings[0]] = graph;
+    graph = {};     
+
+  }
+
+
+
   let keys = Object.keys(obj);
   numSections = keys.length;
+
+  graphList.forEach(element => {
+    keys = keys.filter(a => a !== element)
+  });
+  
+  keys.forEach(key => {
+    delete obj[key];
+  });
+
   section = keys[secIndx];
+  console.log(obj);
 
 
 
@@ -254,7 +287,7 @@ function callback(stream) {
       }
 
       var frequency = idx * ctx.sampleRate / analyser.fftSize;
-      console.log(frequency);
+      //console.log(frequency);
 
       requestAnimationFrame(play);
       if(frequency>4000){
