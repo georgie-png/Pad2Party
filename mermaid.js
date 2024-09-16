@@ -100,6 +100,8 @@ function draw(){
         let lastnode = 0
         text = mermaidText
         let thisSection = obj[section]
+        title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
+        text = title +text; 
         thisSection.text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
@@ -363,4 +365,13 @@ function callback(stream) {
 
   play();
 
+}
+
+function showPad() {
+  var x = document.getElementById("pad");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
 }
