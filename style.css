@@ -7,8 +7,10 @@ canvas {
   display: block;
 }
 
-.mermaid svg { 
-  max-width: 100%; 
+.mermaid { 
+  width: 100%; 
   min-height: 500px;
+  text-align: center;
 }
+
 

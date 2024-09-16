@@ -52,6 +52,7 @@ mermaid.initialize({
 function setup(){
   mic = new p5.AudioIn();
   fft = new p5.FFT();
+
   highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
   lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
 
@@ -141,7 +142,6 @@ function draw(){
         svg
       } = await mermaid.render('graphDiv', graphDefinition);
       eleM.innerHTML = svg;
-
     } catch (err) { 
         // if error show errors?
       if (err instanceof ReferenceError) {
