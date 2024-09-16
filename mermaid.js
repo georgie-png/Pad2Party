@@ -6,18 +6,31 @@ let indx = 0;
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
 
- let mermaidText = "flowchart LR\n ";
- let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
- let nodeTypes = ['(_)' ,'([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))']
+let mermaidText = "flowchart LR\n ";
+let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
+let nodeTypes = ['(_)' ,'([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))']
 
- let section = "";
- let numSections = 0;
- let secIndx = 0
- navigator.getUserMedia = navigator.getUserMedia
-                                   || navigator.webkitGetUserMedia
-                                   || navigator.mozGetUserMedia;
+let section = "";
+let numSections = 0;
+let secIndx = 0;
+let error = []
+var frequency = -1;
 
-            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
+
+let mic;
+let fft;
+let highPeak;
+let lowPeak;
+let threshold = 0.02;
+let micLevel = -1;
+
+
+ //navigator.getUserMedia = navigator.getUserMedia
+ //                                  || navigator.webkitGetUserMedia
+ //                                  || navigator.mozGetUserMedia;
+//
+//            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
+
 
 const interval = setInterval(function() {
   getPadData();
@@ -35,6 +48,35 @@ mermaid.initialize({
     theme: 'base',
   });
 
+
+function setup(){
+  mic = new p5.AudioIn();
+  fft = new p5.FFT();
+  highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
+  lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
+
+  mic.connect(fft);
+  //mic.connect(peak)
+  mic.start();
+  console.log(micLevel)
+
+}
+
+function draw(){
+
+  micLevel = mic.getLevel();
+
+  fft.analyze();
+  highPeak.update(fft);
+  lowPeak.update(fft);
+  
+  if(highPeak.isDetected){
+    mermaidDraw();
+  }else if(lowPeak.isDetected){
+    changeSection();
+  }
+
+}
   // formatting of text like this
 // "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
 
@@ -49,7 +91,6 @@ mermaid.initialize({
   // main function called by button 
   async function mermaidDraw() {
 
-    changeSection();
     
 
     try {
@@ -160,11 +201,13 @@ function md2obj(md)
   //obj = {};
   let graph = {};
   let graphList = [];
+  error = [];
 
-
-
+  lineNum = 0;
+  let lastHeading = -1;
   //loop over md file lines
   md.forEach(mdDoc => {
+    lineNum++;
     // if blank return
     if (mdDoc === "") {return}
 
@@ -199,9 +242,13 @@ function md2obj(md)
 
             obj[headings[0]] = graph;
             
-            graph = {};     
+ 
 
+          }else{
+            error.push(headings[0] + " line " + lastHeading)
           }
+
+          graph = {}; 
         }
         // remove a vlue from the list
         headings.pop();
@@ -210,7 +257,7 @@ function md2obj(md)
       }
       if(headingLvl==1){
         graphList.push(mdDoc);
-
+        lastHeading = lineNum;
       }
 
     }
@@ -246,6 +293,8 @@ function md2obj(md)
     obj[headings[0]] = graph;
     graph = {};     
 
+  }else{
+    error.push(headings[0])
   }
 
 
@@ -264,7 +313,6 @@ function md2obj(md)
   });
 
   section = keys[secIndx];
-
 
 
 }
@@ -301,11 +349,14 @@ function callback(stream) {
           }
       }
 
-      var frequency = idx * ctx.sampleRate / analyser.fftSize;
-      //console.log(frequency);
+      frequency = idx * ctx.sampleRate / analyser.fftSize;
+      console.log(frequency);
 
       requestAnimationFrame(play);
       if(frequency>4000){
+        mermaidDraw();
+      }else if(frequency>400 && frequency<500){
+        changeSection();
         mermaidDraw();
       }
   }
