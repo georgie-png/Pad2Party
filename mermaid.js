@@ -5,9 +5,6 @@ let indx = 0;
 //pad to hold the link to the pad
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
-var osc = new OSC();
-osc.open(); // connect by default to ws://localhost:8080
-
 
  let mermaidText = "flowchart LR\n ";
  let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
@@ -26,6 +23,7 @@ const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
 }, 20000);
+
 const randomHexColorCode = () => {
   let n = (Math.random() * 0xfffff * 1000000).toString(16);
   return '#' + n.slice(0, 6);
@@ -60,6 +58,10 @@ mermaid.initialize({
         let lastnode = 0
         text = mermaidText
         let thisSection = obj[section]
+        var message = new OSC.Message('/text', thisSection.text + thisSection.movement);
+        osc.send(message);
+        title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
+        text = title +text; 
         thisSection.text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
@@ -92,13 +94,8 @@ mermaid.initialize({
         for(let i =0; i<thisSection.text.length; i++){
           text += "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
-        var string = new OSC.Message('/text', thisSection.text.toString());
-        osc.send(string);
-        console.log(string);
 
         // get text from pad
-        //console.log(JSON.stringify(text));
-        //console.log(Object.keys(obj).length);
         // check it is a valid graph
       graphDefinition = await mermaidEval(text);
 
@@ -143,6 +140,7 @@ function getRandomInt() {
 // main fetching function
 function getPadData()
 {
+
     // gets request for pad as txt
     var request = new XMLHttpRequest();
     request.open("GET", pad, false);
@@ -151,6 +149,7 @@ function getPadData()
 
     // passes the text to be processed into obj
     md2obj(returnValue);
+
 
 }
 
@@ -162,7 +161,11 @@ function md2obj(md)
   let headingLvl = 0;
   // array to keep a list of current heading hierarchies
   let headings = [];
-  obj = {};
+  //obj = {};
+  let graph = {};
+  let graphList = [];
+
+
 
   //loop over md file lines
   md.forEach(mdDoc => {
@@ -175,6 +178,8 @@ function md2obj(md)
     if(numHashes>0){
       // clean up title by removing #, making lower case and replacing spaces with _
       mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
+      
+
       // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
       if(headingLvl<numHashes){
         // adds a level
@@ -187,20 +192,37 @@ function md2obj(md)
         headings[headings.length - 1] = mdDoc
       }
       else if (headingLvl>=numHashes){
+
         // go back a level of heading
         headingLvl--;
+
+        if(headingLvl==1){
+
+
+          if("text" in graph && "movement" in graph){
+
+            obj[headings[0]] = graph;
+            
+            graph = {};     
+
+          }
+        }
         // remove a vlue from the list
         headings.pop();
         // replace the last heading in the list
-        headings[headings.length - 1] = mdDoc
+        headings[headings.length - 1] = mdDoc;
+      }
+      if(headingLvl==1){
+        graphList.push(mdDoc);
 
       }
+
     }
     else{ // it is a value and we add it to the obj
       
-      let thisData = obj;
+      let thisData = graph;
       // loop over the current heading level
-      for (let h = 0; h < headings.length; h++) {
+      for (let h = 1; h < headings.length; h++) {
 
         if (h==headings.length-1){ // if it is the last heading in the list add the data
 
@@ -220,8 +242,31 @@ function md2obj(md)
     }
     
   });
+
+
+
+  if("text" in graph && "movement" in graph){
+
+    obj[headings[0]] = graph;
+    graph = {};     
+
+  }
+
+
   let keys = Object.keys(obj);
   numSections = keys.length;
+
+  keys2Del = keys.reduce((keys2Del, key) => {
+    if (graphList.indexOf(key) <= -1) {
+      keys2Del.push(key);
+    }
+    return keys2Del;
+}, []);
+
+  keys2Del.forEach(key => {
+    delete obj[key];
+  });
+
   section = keys[secIndx];
 
 
@@ -234,6 +279,7 @@ function changeSection(){
   secIndx++;
   if(numSections<=secIndx){secIndx=0;}
   section = keys[secIndx];
+
 }
 
 function isNumeric(num){
@@ -251,7 +297,7 @@ function callback(stream) {
   function play() {
       analyser.getByteFrequencyData(data);
 
-      // get fullest bin-
+      // get fullest bin
       var idx = 0;
       for (var j=0; j < analyser.frequencyBinCount; j++) {
           if (data[j] > data[idx]) {
@@ -260,10 +306,7 @@ function callback(stream) {
       }
 
       var frequency = idx * ctx.sampleRate / analyser.fftSize;
-      // console.log(frequency);
-       var message = new OSC.Message('/frequency', frequency);
-       osc.send(message);
-
+      //console.log(frequency);
 
       requestAnimationFrame(play);
       if(frequency>4000){
@@ -274,3 +317,4 @@ function callback(stream) {
   play();
 
 }
+
