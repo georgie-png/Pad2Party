@@ -1,23 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="interface.js">  </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/osc-js@2.4.1/lib/osc.min.js"></script>
-    <style>
-      .mermaid {width:100% !important}
-      .mermaid svg {height:400px !important}
-    </style>
+
   </head>
   <body>
-    <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/visuals?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="600" frameborder="0"></iframe>
-    <button onclick="mermaidDraw()">render</button>
-    <div class="mermaid"></div>
-    <pre id="err"></pre>
+    <div class="topnav">
+      <button onclick="mermaidDraw()">render</button>
+      <button id="send">send message</button>
+      <button onclick="showPad()">show/ hide pad</button>
+    </div>
 
+    <div class="">
+      <div class="">
+        <div class="mermaid"></div>
+      </div>
+      <div class="" id="pad">
+        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/visuals?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="600" frameborder="0"></iframe>
+      </div>
+    </div>
+    <pre id="err"></pre>
     <script src="mermaid.js">  </script>
-    <button id="send">Send Message</button>
-    
     <script type="text/javascript">
       var osc = new OSC();
       osc.open(); // connect by default to ws://localhost:8080
