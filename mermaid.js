@@ -317,7 +317,6 @@ function callback(stream) {
       }
 
       frequency = idx * ctx.sampleRate / analyser.fftSize;
-      console.log(frequency);
 
       requestAnimationFrame(play);
       if(frequency>4000){
