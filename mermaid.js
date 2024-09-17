@@ -37,55 +37,24 @@ let micLevel = -1;
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
-}, 20000);
+}, 30000);
 
 const randomHexColorCode = () => {
   let n = (Math.random() * 0xfffff * 1000000).toString(16);
   return '#' + n.slice(0, 6);
 };
 
-getPadData();
+
+/* function setup(){
+  getPadData();
+} */
+
+window.onload = getPadData();
+
 mermaid.initialize({
     startOnLoad: true,
     theme: 'base',
   });
-/* 
-
-function setup(){
-  mic = new p5.AudioIn();
-  fft = new p5.FFT();
-
-  highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
-  lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
-
-  mic.connect(fft);
-  //mic.connect(peak)
-  mic.start();
-  console.log(micLevel)
-
-}
-
-function draw(){
-
-  micLevel = mic.getLevel();
-  console.log(micLevel);
-  fft.analyze();
-  highPeak.update(fft);
-  lowPeak.update(fft);
-  
-  if(highPeak.isDetected){
-    mermaidDraw();
-  }else if(lowPeak.isDetected){
-    changeSection();
-  }
-
-} */
-  // formatting of text like this
-// "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
-
-
-    //mermaidText += text[i] + " --> " + text[randI] + "\n    ";
-
   eleM = document.querySelector('.mermaid');
   eleE = document.querySelector('#err');
 
@@ -100,10 +69,12 @@ function draw(){
         // get text from input
         //text2 = document.querySelector('textarea').value;
         let lastnode = 0
-        text = mermaidText
+        graphText = mermaidText
+        if(!(section in obj)){ return;}
         let thisSection = obj[section]
+        
         title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
-        text = title +text; 
+        graphText = title +graphText; 
         thisSection.text.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
@@ -111,13 +82,13 @@ function draw(){
             arrow += "|" + thisSection.movement[Math.floor(Math.random()*thisSection.movement.length)] + "|";
           }
           if(lastnode==0){
-            text += lastnode.toString() + node[0] + item+ node[1] + arrow;
+            graphText+= lastnode.toString() + node[0] + item+ node[1] + arrow;
           }
           else if (lastnode ==1){
-            text += lastnode.toString() + node[0] + item+ node[1] + "\n " ;
+            graphText+= lastnode.toString() + node[0] + item+ node[1] + "\n " ;
           }
           else{
-            text += (lastnode-1).toString() + arrow + lastnode.toString() + node[0] + item+ node[1] + "\n " ;
+            graphText+= (lastnode-1).toString() + arrow + lastnode.toString() + node[0] + item+ node[1] + "\n " ;
           }
 
           lastnode++;
@@ -131,15 +102,15 @@ function draw(){
             if(to==0){to++}
             else{to--}
           }
-          text += from.toString() + arrow + to.toString() + "\n " ;
+          graphText+= from.toString() + arrow + to.toString() + "\n " ;
         }
         for(let i =0; i<thisSection.text.length; i++){
-          text += "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
+          graphText+= "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
         
         // get text from pad
         // check it is a valid graph
-      graphDefinition = await mermaidEval(text);
+      graphDefinition = await mermaidEval(graphText);
 
       //Requests svg of graph and sets it in html
       const {
@@ -157,20 +128,20 @@ function draw(){
       eleE.insertAdjacentHTML('beforeend', `🚫${err.message}\n`);
     }
   };
-  async function mermaidEval(text) {
+  async function mermaidEval(graphText) {
 
     // checks its all mermaid
-    if (!text.match(/^[a-zA-Z]/)) {
+    if (!graphText.match(/^[a-zA-Z]/)) {
     // markdown ```mermaid, remove first and last line
-      text = text.split('\n').slice(1, -1).join('\n');
+      graphText = graphText.split('\n').slice(1, -1).join('\n');
     }
-    text = text.replace(/"`.*?`"/g, function(match) {
+    graphText = graphText.replace(/"`.*?`"/g, function(match) {
       return eval(match.slice(1, -1));
     });
-    text = text.replace(/"\{.*?\}"/g, function(match) {
+    graphText = graphText.replace(/"\{.*?\}"/g, function(match) {
       return eval(match.slice(1, -1));
     });
-    return text;
+    return graphText;
   }
 
 
@@ -184,12 +155,19 @@ function getPadData()
 
     // gets request for pad as txt
     var request = new XMLHttpRequest();
-    request.open("GET", pad, false);
+    request.open("GET", pad, true);
     request.send(null);
-    var returnValue = request.responseText;
+    
+    request.onreadystatechange = function () {
+      if(request.readyState === XMLHttpRequest.DONE) {
+        console.log("pad updated")
+        var returnValue = request.responseText;
+        // passes the text to be processed into obj
+        md2obj(returnValue);
+      }
+  }
 
-    // passes the text to be processed into obj
-    md2obj(returnValue);
+
 
 
 }
@@ -414,3 +392,41 @@ function simple_thresholding(data, threshold){
   }
   return peaks
 }
+
+/* 
+
+function setup(){
+
+  mic = new p5.AudioIn();
+  fft = new p5.FFT();
+
+  highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
+  lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
+
+  mic.connect(fft);
+  //mic.connect(peak)
+  mic.start();
+  console.log(micLevel)
+
+}
+
+function draw(){
+
+  micLevel = mic.getLevel();
+  console.log(micLevel);
+  fft.analyze();
+  highPeak.update(fft);
+  lowPeak.update(fft);
+  
+  if(highPeak.isDetected){
+    mermaidDraw();
+  }else if(lowPeak.isDetected){
+    changeSection();
+  }
+
+} */
+  // formatting of text like this
+// "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
+
+
+    //mermaidText += text[i] + " --> " + text[randI] + "\n    ";

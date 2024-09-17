@@ -3,8 +3,8 @@
   <head>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
-   <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js" integrity="sha512-S+9EbrqLIvdeMVI0d4xfxeNpetEDxRTbmdj2fdb4o63bDUQ5wIB8juD75SVzhKSNYlcuFLdWTS56G/qBh9IbGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!--  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js" integrity="sha512-S+9EbrqLIvdeMVI0d4xfxeNpetEDxRTbmdj2fdb4o63bDUQ5wIB8juD75SVzhKSNYlcuFLdWTS56G/qBh9IbGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
  -->
 
   </head>
@@ -13,9 +13,9 @@
       <button onclick="mermaidDraw()">render</button>
       <button onclick="showPad()">show/ hide pad</button>
     </div>
-        <div class="mermaid"></div>
-      <div class="" id="pad">
-        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/visuals?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="600" frameborder="0"></iframe>
+        <div class="mermaid split top"></div>
+      <div  id="pad" class="split bottom">
+        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/visuals?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="100%" frameborder="0"></iframe>
       </div>
     </div>
     <pre id="err"></pre>
