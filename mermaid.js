@@ -37,7 +37,7 @@ let micLevel = -1;
 const interval = setInterval(function() {
   getPadData();
   console.log("request pad");
-}, 30000);
+}, 20000);
 
 const randomHexColorCode = () => {
   let n = (Math.random() * 0xfffff * 1000000).toString(16);
