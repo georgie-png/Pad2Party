@@ -21,15 +21,17 @@ let mic;
 let fft;
 let highPeak;
 let lowPeak;
+let highGate = false;
+let lowGate = false;
 let threshold = 0.02;
 let micLevel = -1;
 
 
- //navigator.getUserMedia = navigator.getUserMedia
- //                                  || navigator.webkitGetUserMedia
- //                                  || navigator.mozGetUserMedia;
-//
-//            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
+ navigator.getUserMedia = navigator.getUserMedia
+                                   || navigator.webkitGetUserMedia
+                                   || navigator.mozGetUserMedia;
+
+            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
 
 
 const interval = setInterval(function() {
@@ -47,7 +49,7 @@ mermaid.initialize({
     startOnLoad: true,
     theme: 'base',
   });
-
+/* 
 
 function setup(){
   mic = new p5.AudioIn();
@@ -66,7 +68,7 @@ function setup(){
 function draw(){
 
   micLevel = mic.getLevel();
-
+  console.log(micLevel);
   fft.analyze();
   highPeak.update(fft);
   lowPeak.update(fft);
@@ -77,7 +79,7 @@ function draw(){
     changeSection();
   }
 
-}
+} */
   // formatting of text like this
 // "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
 
@@ -338,10 +340,31 @@ function callback(stream) {
   var analyser = ctx.createAnalyser();
   mic.connect(analyser); 
 
+  var sampleBuffer = new Float32Array(analyser.fftSize);
   var data = new Uint8Array(analyser.frequencyBinCount);
 
   function play() {
-      analyser.getByteFrequencyData(data);
+
+    /* analyser.getFloatTimeDomainData(sampleBuffer);
+
+    // Compute average power over the interval.
+    let sumOfSquares = 0;
+    for (let i = 0; i < sampleBuffer.length; i++) {
+      sumOfSquares += sampleBuffer[i] ** 2;
+    }
+    const avgPowerDecibels = 10 * Math.log10(sumOfSquares / sampleBuffer.length);
+
+    // Compute peak instantaneous power over the interval.
+    let peakInstantaneousPower = 0;
+    for (let i = 0; i < sampleBuffer.length; i++) {
+      const power = sampleBuffer[i] ** 2;
+      peakInstantaneousPower = Math.max(power, peakInstantaneousPower);
+    }
+    const peakInstantaneousPowerDecibels = 10 * Math.log10(peakInstantaneousPower);
+
+    console.log(peakInstantaneousPowerDecibels);
+    console.log(avgPowerDecibels); */
+    analyser.getByteFrequencyData(data);
 
       // get fullest bin
       var idx = 0;
@@ -352,14 +375,20 @@ function callback(stream) {
       }
 
       frequency = idx * ctx.sampleRate / analyser.fftSize;
-      console.log(frequency);
 
       requestAnimationFrame(play);
-      if(frequency>4000){
+      if(frequency>4000 && !highGate){
         mermaidDraw();
-      }else if(frequency>400 && frequency<500){
+        highGate = true;
+      }else if (frequency<4000) {
+        highGate = false;
+      }
+      if(frequency<3000 && !lowGate){
         changeSection();
         mermaidDraw();
+        lowGate = true;
+      }else if(frequency>3000){
+        lowGate = false;
       }
   }
 
@@ -374,4 +403,14 @@ function showPad() {
   } else {
     x.style.display = "none";
   }
+}
+
+function simple_thresholding(data, threshold){
+  let peaks = []
+  for ( let i=0; i< data.length - 1; i++){
+      if (data[i] > threshold && data[i] > data[i - 1] && data[i] > data[i + 1]){
+          peaks.push(i);
+      }
+  }
+  return peaks
 }

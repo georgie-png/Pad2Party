@@ -12,6 +12,11 @@ canvas {
   min-height: 500px;
 }
 
+.mermaid{
+  text-align: center;
+  padding: 5%;
+}
+
 /* Create two equal columns that floats next to each other */
 .column {
   float: left;
