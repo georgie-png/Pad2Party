@@ -24,11 +24,11 @@ let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
  let lowPeak;
  let threshold = 0.02;
  let micLevel = -1;
-//  navigator.getUserMedia = navigator.getUserMedia
-//                                    || navigator.webkitGetUserMedia
-//                                    || navigator.mozGetUserMedia;
+  navigator.getUserMedia = navigator.getUserMedia
+                                    || navigator.webkitGetUserMedia
+                                    || navigator.mozGetUserMedia;
 
-//             navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
+             navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
 
 const interval = setInterval(function() {
   getPadData();
@@ -45,36 +45,6 @@ mermaid.initialize({
     startOnLoad: true,
     theme: 'base',
   });
-
-
-  function setup(){
-    mic = new p5.AudioIn();
-    fft = new p5.FFT();
-  
-    highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
-    lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
-  
-    mic.connect(fft);
-    //mic.connect(peak)
-    mic.start();
-    console.log(micLevel)
-  
-  }
-  function draw(){
-
-    micLevel = mic.getLevel();
-  
-    fft.analyze();
-    highPeak.update(fft);
-    lowPeak.update(fft);
-    
-    if(highPeak.isDetected){
-      mermaidDraw();
-    }else if(lowPeak.isDetected){
-      changeSection();
-    }
-  
-  }
 
   eleM = document.querySelector('.mermaid');
   eleE = document.querySelector('#err');
