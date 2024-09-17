@@ -228,6 +228,7 @@ function md2obj(md)
 
           }else{
             error.push(headings[0] + " line " + lastHeading)
+            console.log(error);
           }
 
           graph = {}; 
