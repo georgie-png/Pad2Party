@@ -105,6 +105,7 @@ canvas {
 .top {
   top: 0;
   width: 90%;
+  align-content: center;
 
 }
 
