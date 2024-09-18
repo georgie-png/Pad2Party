@@ -6,7 +6,9 @@ let indx = 0;
 let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
 
 
-let mermaidText = "flowchart LR\n ";
+let mermaidTextLR = "flowchart LR\n ";
+let mermaidTextTD = "flowchart TD\n ";
+
 let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
 let nodeTypes = ['(_)' ,'([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))']
 
@@ -69,7 +71,11 @@ mermaid.initialize({
         // get text from input
         //text2 = document.querySelector('textarea').value;
         let lastnode = 0
-        graphText = mermaidText
+        graphText = mermaidTextTD;
+        if(eleM.offsetWidth>eleM.offsetHeight){
+          graphText = mermaidTextLR;
+        }
+        
         if(!(section in obj)){ return;}
         let thisSection = obj[section]
         
@@ -378,8 +384,10 @@ function showPad() {
   var x = document.getElementById("pad");
   if (x.style.display === "none") {
     x.style.display = "block";
+    eleM.style.height = '50%'
   } else {
     x.style.display = "none";
+    eleM.style.height = '100%'
   }
 }
 
