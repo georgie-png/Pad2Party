@@ -100,11 +100,16 @@ mermaid.initialize({
 
           lastnode++;
         }); 
+
+        let numLoops =  Math.floor(thisSection.steps.length + Math.random(10));
         
-        for (let i=0 ; i<12 ; i++){
+        for (let i=0 ; i<numLoops ; i++){
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let from = getRandomInt();
           let to = getRandomInt();
+          if(Math.random()>0.1){
+            arrow += "|" + thisSection.movements[Math.floor(Math.random()*thisSection.movements.length)] + "|";
+          }
           if(from==to && Math.random()>0.5){
             if(to==0){to++}
             else{to--}
