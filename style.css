@@ -47,6 +47,18 @@ canvas {
   text-decoration: none;
   font-size: 17px;
 }
+.topnav button{
+  border-style: solid;
+  border-color: grey;
+  border-radius: 100px;
+}
+.topnav button:hover{
+  color: #f2f2f2;
+  border-style: solid;
+  border-color: rgb(239, 239, 239);
+  border-radius: 100px;
+  background-color: rgb(111, 111, 111);
+}
 
 .topnav a:hover {
   color: black;
