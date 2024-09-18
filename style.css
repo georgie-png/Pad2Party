@@ -121,3 +121,18 @@ canvas {
   border-radius: 10px;
   padding: 25px;
 }
+
+@media (max-width: 1000px)  { 
+  .topnav button {
+    border-style: solid;
+    border-color: grey;
+    border-radius: 100px;
+    font-size: x-large;
+    padding: 17px;
+    margin: 7px;
+  }
+  .top {
+    padding-top: 5%;
+    padding-bottom: 15%;
+  }
+ }
