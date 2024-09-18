@@ -116,3 +116,8 @@ canvas {
   width: 100%;
 
 }
+
+#dialog {
+  border-radius: 10px;
+  padding: 25px;
+}

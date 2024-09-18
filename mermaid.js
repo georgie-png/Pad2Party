@@ -123,7 +123,9 @@ mermaid.initialize({
       const {
         svg
       } = await mermaid.render('graphDiv', graphDefinition);
+      eleM.setAttribute("alt",graphDefinition);
       eleM.innerHTML = svg;
+
     } catch (err) { 
         // if error show errors?
       if (err instanceof ReferenceError) {
@@ -400,7 +402,7 @@ function simple_thresholding(data, threshold){
 }
 
 function showError(){
-  console.log(error)
+  //console.log(error)
   if (error.length>0){
 
     // create elements
@@ -413,12 +415,15 @@ function showError(){
     // append the text to the li
     li.appendChild(textNode);
 
-  // return the li
-  return li;
-});
+    // return the li
+    return li;
+    
+    }); 
 
-// append the elements to the page
-document.getElementById("errorlist").appendChild(...elements);
+  //   append the elements to the page
+  let errorWindow = document.getElementById("errorlist");
+  errorWindow.innerHTML = '';
+  errorWindow.appendChild(...elements);
   }
 }
 

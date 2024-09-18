@@ -10,12 +10,12 @@
   </head>
   <body>
     <div class="topnav">
-      <button onclick="mermaidDraw()">next graph</button>
-      <button onclick="changeSection();mermaidDraw()">randomise graph</button>
+      <button onclick="changeSection(); mermaidDraw()">next graph</button>
+      <button onclick="mermaidDraw()">randomise graph</button>
       <button onclick="showPad()">show/ hide pad</button>
       <button onclick="window.dialog.showModal();">error debugging 🔧</button>
       <dialog id="dialog">
-        <p>🐛 Hi There! There's an error at section</p>
+        <p>🐛 Hi There! There's an error roughly around section</p>
         <p id="errorlist"></p>
         <form method="dialog">
           <button>Close</button>
