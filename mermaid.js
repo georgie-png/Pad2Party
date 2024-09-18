@@ -39,7 +39,7 @@ let micLevel = -1;
 const interval = setInterval(function() {
   getPadData();
   showError();
-  console.log("request pad");
+  //console.log("request pad");
 }, 20000);
 
 const randomHexColorCode = () => {
@@ -82,11 +82,11 @@ mermaid.initialize({
         
         title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
         graphText = title +graphText; 
-        thisSection.text.forEach((item) => {
+        thisSection.steps.forEach((item) => {
           let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
           let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
           if(Math.random()>0.6){
-            arrow += "|" + thisSection.movement[Math.floor(Math.random()*thisSection.movement.length)] + "|";
+            arrow += "|" + thisSection.movements[Math.floor(Math.random()*thisSection.movements.length)] + "|";
           }
           if(lastnode==0){
             graphText+= lastnode.toString() + node[0] + item+ node[1] + arrow;
@@ -111,7 +111,7 @@ mermaid.initialize({
           }
           graphText+= from.toString() + arrow + to.toString() + "\n " ;
         }
-        for(let i =0; i<thisSection.text.length; i++){
+        for(let i =0; i<thisSection.steps.length; i++){
           graphText+= "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
         }
         
@@ -155,7 +155,7 @@ mermaid.initialize({
 
 
 function getRandomInt() {
-  return Math.floor(Math.random() * obj[section].text.length);
+  return Math.floor(Math.random() * obj[section].steps.length);
 }
 
 // main fetching function
@@ -169,7 +169,7 @@ function getPadData()
     
     request.onreadystatechange = function () {
       if(request.readyState === XMLHttpRequest.DONE) {
-        console.log("pad updated")
+        //console.log("pad updated")
         var returnValue = request.responseText;
         // passes the text to be processed into obj
         md2obj(returnValue);
@@ -179,8 +179,9 @@ function getPadData()
 
 function md2obj(md)
 {
+  var separateLines = md.split(/\r?\n|\r|\n/g);
+
   // splits the md file into lines
-  md = md.match(/(#+.*)|([^!?;.\n]+.)/g).map(v=>v.trim());
   // var to keep track of heading level
   let headingLvl = 0;
   // array to keep a list of current heading hierarchies
@@ -193,7 +194,7 @@ function md2obj(md)
   lineNum = 0;
   let lastHeading = -1;
   //loop over md file lines
-  md.forEach(mdDoc => {
+  separateLines.forEach(mdDoc => {
     lineNum++;
     // if blank return
     if (mdDoc === "") {return}
@@ -214,8 +215,13 @@ function md2obj(md)
         headings.push(mdDoc);
       }
       else if(headingLvl==numHashes){
+        if(numHashes==1 &&(mdDoc == "steps"||mdDoc=="movements")){
+          error.push(headings[0] + ": line " + lastHeading);
+        }else{
+          headings[headings.length - 1] = mdDoc
+        }
         // change name of last heading in the list
-        headings[headings.length - 1] = mdDoc
+
       }
       else if (headingLvl>=numHashes){
 
@@ -225,14 +231,14 @@ function md2obj(md)
         if(headingLvl==1){
 
 
-          if("text" in graph && "movement" in graph){
+          if("steps" in graph && "movements" in graph){
 
             obj[headings[0]] = graph;
             
  
 
           }else{
-            error.push(headings[0] + " line " + lastHeading)
+            error.push(headings[0] + ": line " + lastHeading)
           }
 
           graph = {}; 
@@ -275,13 +281,13 @@ function md2obj(md)
 
 
 
-  if("text" in graph && "movement" in graph){
+  if("steps" in graph && "movements" in graph){
 
     obj[headings[0]] = graph;
     graph = {};     
 
   }else{
-    error.push(headings[0])
+    error.push(headings[0] + ": line " + lastHeading)
 
   }
 
@@ -405,6 +411,8 @@ function showError(){
   //console.log(error)
   if (error.length>0){
 
+    let ul  =document.createElement('ul');
+
     // create elements
     const elements = error.map(str => {
     // create DOM element
@@ -414,16 +422,14 @@ function showError(){
     const textNode = document.createTextNode(str);
     // append the text to the li
     li.appendChild(textNode);
-
-    // return the li
-    return li;
+    ul.appendChild(li);
     
     }); 
 
   //   append the elements to the page
   let errorWindow = document.getElementById("errorlist");
   errorWindow.innerHTML = '';
-  errorWindow.appendChild(...elements);
+  errorWindow.appendChild(ul);
   }
 }
 
