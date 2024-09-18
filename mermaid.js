@@ -38,6 +38,7 @@ let micLevel = -1;
 
 const interval = setInterval(function() {
   getPadData();
+  showError();
   console.log("request pad");
 }, 20000);
 
@@ -172,10 +173,6 @@ function getPadData()
         md2obj(returnValue);
       }
   }
-
-
-
-
 }
 
 function md2obj(md)
@@ -234,7 +231,6 @@ function md2obj(md)
 
           }else{
             error.push(headings[0] + " line " + lastHeading)
-            console.log(error);
           }
 
           graph = {}; 
@@ -284,6 +280,7 @@ function md2obj(md)
 
   }else{
     error.push(headings[0])
+
   }
 
 
@@ -400,6 +397,29 @@ function simple_thresholding(data, threshold){
       }
   }
   return peaks
+}
+
+function showError(){
+  console.log(error)
+  if (error.length>0){
+
+    // create elements
+    const elements = error.map(str => {
+    // create DOM element
+    const li = document.createElement("li");
+
+    // create text node containing the string
+    const textNode = document.createTextNode(str);
+    // append the text to the li
+    li.appendChild(textNode);
+
+  // return the li
+  return li;
+});
+
+// append the elements to the page
+document.getElementById("errorlist").appendChild(...elements);
+  }
 }
 
 /* 
