@@ -27,8 +27,6 @@ let highGate = false;
 let lowGate = false;
 let threshold = 0.02;
 let micLevel = -1;
-var osc = new OSC();
-osc.open(); // connect by default to ws://localhost:8080
 
 
  navigator.getUserMedia = navigator.getUserMedia
@@ -81,8 +79,7 @@ mermaid.initialize({
         
         if(!(section in obj)){ return;}
         let thisSection = obj[section]
-        var message = new OSC.Message('/text', thisSection.text+thisSection.movements);
-        osc.send(message);
+        
         title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
         graphText = title +graphText; 
         thisSection.steps.forEach((item) => {
@@ -373,19 +370,19 @@ function callback(stream) {
       }
 
       frequency = idx * ctx.sampleRate / analyser.fftSize;
-      //console.log(frequency);
+
       requestAnimationFrame(play);
-      if(frequency>3000 && !highGate){
+      if(frequency>4000 && !highGate){
         mermaidDraw();
         highGate = true;
-      }else if (frequency<3000) {
+      }else if (frequency<4000) {
         highGate = false;
       }
-      if(frequency<2000 && !lowGate){
+      if(frequency<3000 && !lowGate){
         changeSection();
         mermaidDraw();
         lowGate = true;
-      }else if(frequency>2000){
+      }else if(frequency>3000){
         lowGate = false;
       }
   }
