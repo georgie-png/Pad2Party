@@ -135,4 +135,7 @@ canvas {
     padding-top: 5%;
     padding-bottom: 15%;
   }
+  p {
+    font-size: xx-large;
+  }
  }
