@@ -3,8 +3,9 @@ let obj = {};
 // indx to hold our place in the txt
 let indx = 0;
 //pad to hold the link to the pad - old - https://pad.vvvvvvaria.org/visuals
-let pad  = "https://pad.vvvvvvaria.org/ether-vis/export/txt";
 
+//pad to hold the link to the Avalon pad - https://pad.vvvvvvaria.org/ether-vis
+let pad  = "https://pad.vvvvvvaria.org/LCC-ether-vis/export/txt";
 
 let mermaidTextLR = "flowchart LR\n ";
 let mermaidTextTD = "flowchart TD\n ";
