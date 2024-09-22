@@ -2,38 +2,31 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" href="style.css">
-    <script src="interface.js">  </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/osc-js@2.4.1/lib/osc.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js" integrity="sha512-S+9EbrqLIvdeMVI0d4xfxeNpetEDxRTbmdj2fdb4o63bDUQ5wIB8juD75SVzhKSNYlcuFLdWTS56G/qBh9IbGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </head>
   <body>
     <div class="topnav">
-      <button onclick="mermaidDraw()">render</button>
-      <button id="send">send message</button>
+      <button onclick="changeSection(); mermaidDraw()">next graph</button>
+      <button onclick="mermaidDraw()">randomise graph</button>
       <button onclick="showPad()">show/ hide pad</button>
+      <button onclick="window.dialog.showModal();">error debugging 🔧</button>
+      <dialog id="dialog">
+        <p>🐛 Hi There! There are errors in section</p>
+        <p id="errorlist"></p>
+        <form method="dialog">
+          <button>Close</button>
+        </form>
+      </dialog>
     </div>
-
-    <div class="">
-      <div class="">
-        <div class="mermaid"></div>
-      </div>
-      <div class="" id="pad">
-        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/visuals?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="600" frameborder="0"></iframe>
-      </div>
+        <div class="mermaid split top"></div>
+      <div  id="pad" class="split bottom">
+        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/LCC-ether-vis?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="100%" frameborder="0"></iframe>      </div>
     </div>
     <pre id="err"></pre>
     <script src="mermaid.js">  </script>
-    <script type="text/javascript">
-      var osc = new OSC();
-      osc.open(); // connect by default to ws://localhost:8080
-      document.getElementById('send').addEventListener('click', () => {
-        var message = new OSC.Message('/test/random', Math.random());
-        osc.send(message);
-      });
-    </script>
   </body>
+
 
   </html>
 
