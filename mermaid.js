@@ -375,17 +375,17 @@ function callback(stream) {
       frequency = idx * ctx.sampleRate / analyser.fftSize;
 
       requestAnimationFrame(play);
-      if(frequency>4000 && !highGate){
+      if(frequency>2000 && !highGate){
         mermaidDraw();
         highGate = true;
-      }else if (frequency<4000) {
+      }else if (frequency<2000) {
         highGate = false;
       }
-      if(frequency<3000 && !lowGate){
+      if(frequency<800 && !lowGate){
         changeSection();
         mermaidDraw();
         lowGate = true;
-      }else if(frequency>3000){
+      }else if(frequency>800){
         lowGate = false;
       }
   }
