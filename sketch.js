@@ -43,12 +43,6 @@ function draw() {
     
   }
 
-  // draw the bg from the object
-  //background(int(obj.section_2.styling.background), 5);
-  //fill(255,10);
-  //textSize(int(obj.section_2.styling.textsize));
-  //window["textSize"](int(obj.section_2.styling.textsize));
-  // write current indexed text
   window['textAlign'](CENTER);
 
   text(obj.section_2.text[indx], width*0.5, height*0.5);
@@ -105,32 +99,42 @@ function md2obj(md)
     let numHashes = (mdDoc.split("#").length - 1)
     // if num # is greater than 0 (its a heading)
     if(numHashes>0){
-      // clean up title by removing #, making lower case and replacing spaces with _
-      mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
-      // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
-      if(headingLvl<numHashes){
-        // adds a level
-        headingLvl++;
-        // add name of heading to list
-        headings.push(mdDoc);
-      }
-      else if(headingLvl==numHashes){
-        // change name of last heading in the list
-        headings[headings.length - 1] = mdDoc
-      }
-      else if (headingLvl>=numHashes){
-        // go back a level of heading
-        headingLvl--;
-        // remove a vlue from the list
-        headings.pop();
-        // replace the last heading in the list
-        headings[headings.length - 1] = mdDoc
-
-      }
+     sort_Headings(mdDoc);
     }
     else{ // it is a value and we add it to the obj
+      add_data(obj)
+    }
+    
+  });
 
-      let thisData = obj;
+}
+
+function sort_Headings(mdDoc) {
+   // clean up title by removing #, making lower case and replacing spaces with _
+   mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
+   // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
+   if(headingLvl<numHashes){
+     // adds a level
+     headingLvl++;
+     // add name of heading to list
+     headings.push(mdDoc);
+   }
+   else if(headingLvl==numHashes){
+     // change name of last heading in the list
+     headings[headings.length - 1] = mdDoc
+   }
+   else if (headingLvl>=numHashes){
+     // go back a level of heading
+     headingLvl--;
+     // remove a vlue from the list
+     headings.pop();
+     // replace the last heading in the list
+     headings[headings.length - 1] = mdDoc
+
+   }
+}
+
+function add_data(thisData){
       // loop over the current heading level
       for (let h = 0; h < headings.length; h++) {
 
@@ -162,10 +166,6 @@ function md2obj(md)
           thisData = thisData[headings[h]];
         }
       }
-    }
-    
-  });
-
 }
 
 function isNumeric(num){
