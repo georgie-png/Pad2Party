@@ -1,4 +1,4 @@
-![screenshot of one of the generated graphs](Screenshot from 2025-04-24 23-34-16.png)
+![screenshot of one of the generated graphs](https://github.com/georgie-png/Pad2Party/blob/main/Screenshot%20from%202025-04-24%2023-34-16.png)
 
 # Pad2Party
 
