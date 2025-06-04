@@ -1,3 +1,5 @@
+![screenshot of one of the generated graphs](Screenshot from 2025-04-24 23-34-16.png)
+
 # Pad2Party
 
 A fun bit of code that turns pads into mermaid graphs. This is still an early messy edition, and will be updated when we have more time . . . . to be more user friendly/customisable.
