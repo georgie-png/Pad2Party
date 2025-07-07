@@ -1,345 +1,130 @@
-// obj to hold the pad info
-let obj = {};
-// indx to hold our place in the txt
-let indx = 0;
-//pad to hold the link to the pad - old - https://pad.vvvvvvaria.org/visuals
-
-//pad to hold the link to the Avalon pad - https://pad.vvvvvvaria.org/ether-vis
-let pad  = "https://pad.vvvvvvaria.org/LCC-ether-vis/export/txt";
-
-let mermaidTextLR = "flowchart LR\n ";
-let mermaidTextTD = "flowchart TD\n ";
-
-let arrowTypes = [" --> ", " ---> ", " ----> ",  " -.-> "," -..-> ", " -...-> ", " -.- "," -..- "," -...- ", " ==> ", " ===> ", " ====> "," === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o "," --x ","o--o", " <--> ", " x--x "]
-let nodeTypes = ['(_)' ,'([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))']
-
-let section = "";
-let numSections = 0;
-let secIndx = 0;
-let error = []
-var frequency = -1;
-
-
-let mic;
-let fft;
-let highPeak;
-let lowPeak;
-let highGate = false;
-let lowGate = false;
-let threshold = 0.02;
-let micLevel = -1;
-
-
- navigator.getUserMedia = navigator.getUserMedia
-                                   || navigator.webkitGetUserMedia
-                                   || navigator.mozGetUserMedia;
-
-            navigator.getUserMedia({ video : false, audio : true }, callback, console.log);
-
-
-const interval = setInterval(function() {
-  getPadData();
-  showError();
-  //console.log("request pad");
-}, 20000);
-
-const randomHexColorCode = () => {
-  let n = (Math.random() * 0xfffff * 1000000).toString(16);
-  return '#' + n.slice(0, 6);
-};
-
-
-/* function setup(){
-  getPadData();
-} */
-
-window.onload = getPadData();
 
 mermaid.initialize({
-    startOnLoad: true,
-    theme: 'base',
-  });
-  eleM = document.querySelector('.mermaid');
-  eleE = document.querySelector('#err');
+  startOnLoad: true,
+  theme: 'base',
+});
 
-  //setTimeout(mermaidDraw, 200);
+// class that turns a sections object into a mermaid qraph
+class obj2Mer {
+
+  graph_obj = {};
+  graph_name = "Huh?";
+
+  mermaidTextLR = "flowchart LR\n ";
+  mermaidTextTD = "flowchart TD\n ";
+
+  arrowTypes = [" --> ", " ---> ", " ----> ", " -.-> ", " -..-> ", " -...-> ", " -.- ", " -..- ", " -...- ", " ==> ", " ===> ", " ====> ", " === ", " ==== ", " ===== ", " ~~~ ", " --- ", " ---- ", " ----- ", " --o ", " --x ", "o--o", " <--> ", " x--x "];
+  nodeTypes = ['(_)', '([_])', '[[_]]', '[(_)]', '((_))', '>_]', '{_}', '{{_}}', '[/_/]', '[\\_\\]', '[/_\\]', '[\\_/]', '(((_)))'];
+
+  setObj(graph_obj, graph_name) {
+
+    this.graph_obj = graph_obj;
+    this.graph_name = graph_name
+
+  }
 
   // main function called by button 
-  async function mermaidDraw() {
-
-    
+  async GenGraph( portrait = true) {
 
     try {
-        // get text from input
-        //text2 = document.querySelector('textarea').value;
-        let lastnode = 0
-        graphText = mermaidTextTD;
-        if(eleM.offsetWidth>eleM.offsetHeight){
-          graphText = mermaidTextLR;
-        }
-        
-        if(!(section in obj)){ return;}
-        let thisSection = obj[section]
-        
-        title = "\n" + "---" +"\n"+ "title: "+ section +"\n"+ "---" +"\n";
-        graphText = title +graphText; 
-        thisSection.steps.forEach((item) => {
-          let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
-          let node = nodeTypes[Math.floor(Math.random()*nodeTypes.length)].split("_");
-          if(Math.random()>0.6){
-            arrow += "|" + thisSection.movements[Math.floor(Math.random()*thisSection.movements.length)] + "|";
-          }
-          if(lastnode==0){
-            graphText+= lastnode.toString() + node[0] + item+ node[1] + arrow;
-          }
-          else if (lastnode ==1){
-            graphText+= lastnode.toString() + node[0] + item+ node[1] + "\n " ;
-          }
-          else{
-            graphText+= (lastnode-1).toString() + arrow + lastnode.toString() + node[0] + item+ node[1] + "\n " ;
-          }
+      // get text from input
+      let lastNode = 0
+      let graphText = this.mermaidTextTD;
+      if (portrait) {
+        graphText = this.mermaidTextLR;
+      }
 
-          lastnode++;
-        }); 
+      let title = "\n" + "---" + "\n" + "title: " + this.graph_name + "\n" + "---" + "\n";
+      graphText = title + graphText;
+      this.graph_obj.steps.forEach((item) => {
+        let arrow = this.arrowTypes[Math.floor(Math.random() * this.arrowTypes.length)];
+        let node = this.nodeTypes[Math.floor(Math.random() * this.nodeTypes.length)].split("_");
+        if (Math.random() > 0.6) {
+          arrow += "|" + this.graph_obj.movements[Math.floor(Math.random() * this.graph_obj.movements.length)] + "|";
+        }
+        if (lastNode == 0) {
+          graphText += lastNode.toString() + node[0] + item + node[1] + arrow;
+        }
+        else if (lastNode == 1) {
+          graphText += lastNode.toString() + node[0] + item + node[1] + "\n ";
+        }
+        else {
+          graphText += (lastNode - 1).toString() + arrow + lastNode.toString() + node[0] + item + node[1] + "\n ";
+        }
 
-        let numLoops =  Math.floor(10 +Math.random(10));
-        
-        for (let i=0 ; i<numLoops ; i++){
-          let arrow = arrowTypes[Math.floor(Math.random()*arrowTypes.length)];
-          let from = getRandomInt();
-          let to = getRandomInt();
-          if(Math.random()>0.7){
-            arrow += "|" + thisSection.movements[Math.floor(Math.random()*thisSection.movements.length)] + "|";
-          }
-          if(from==to && Math.random()>0.5){
-            if(to==0){to++}
-            else{to--}
-          }
-          graphText+= from.toString() + arrow + to.toString() + "\n " ;
+        lastNode++;
+      });
+
+      let numLoops = Math.floor(10 + Math.random(10));
+
+      for (let i = 0; i < numLoops; i++) {
+        let arrow = this.arrowTypes[Math.floor(Math.random() * this.arrowTypes.length)];
+        let from = this.getRandomNodeIndx(this.graph_obj);
+        let to = this.getRandomNodeIndx(this.graph_obj);
+        if (Math.random() > 0.7) {
+          arrow += "|" + this.graph_obj.movements[Math.floor(Math.random() * this.graph_obj.movements.length)] + "|";
         }
-        for(let i =0; i<thisSection.steps.length; i++){
-          graphText+= "style " + i.toString() +" fill:" + randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
+        if (from == to && Math.random() > 0.5) {
+          if (to == 0) { to++ }
+          else { to-- }
         }
-        
-        // get text from pad
-        // check it is a valid graph
-      graphDefinition = await mermaidEval(graphText);
+        graphText += from.toString() + arrow + to.toString() + "\n ";
+      }
+      for (let i = 0; i < this.graph_obj.steps.length; i++) {
+        graphText += "style " + i.toString() + " fill:" + this.randomHexColorCode() + ",stroke:#333,color:#fff,stroke-width:4px" + "\n ";
+      }
+
+      let graphDefinition = await this.mermaidEval(graphText);
+
 
       //Requests svg of graph and sets it in html
       const {
         svg
       } = await mermaid.render('graphDiv', graphDefinition);
-      eleM.setAttribute("alt",graphDefinition);
-      eleM.innerHTML = svg;
+   
 
-    } catch (err) { 
-        // if error show errors?
+      return {
+        svg: svg,
+        alt_description: graphDefinition,
+    }
+
+
+    } catch (err) {
+      // if error show errors?
       if (err instanceof ReferenceError) {
-        varname = err.message.split(' ')[0];
+        let varname = err.message.split(' ')[0];
         window[varname] = varname;
-        setTimeout(mermaidDraw, 0);
+        setTimeout(this.GenGraph, 0);
       }
       console.error(err);
-      eleE.insertAdjacentHTML('beforeend', `🚫${err.message}\n`);
+      
     }
   };
-  async function mermaidEval(graphText) {
+
+  async mermaidEval(graphText) {
 
     // checks its all mermaid
     if (!graphText.match(/^[a-zA-Z]/)) {
-    // markdown ```mermaid, remove first and last line
+      // markdown ```mermaid, remove first and last line
       graphText = graphText.split('\n').slice(1, -1).join('\n');
     }
-    graphText = graphText.replace(/"`.*?`"/g, function(match) {
+    graphText = graphText.replace(/"`.*?`"/g, function (match) {
       return eval(match.slice(1, -1));
     });
-    graphText = graphText.replace(/"\{.*?\}"/g, function(match) {
+    graphText = graphText.replace(/"\{.*?\}"/g, function (match) {
       return eval(match.slice(1, -1));
     });
     return graphText;
   }
 
-
-function getRandomInt() {
-  return Math.floor(Math.random() * obj[section].steps.length);
-}
-
-// main fetching function
-function getPadData()
-{
-
-    // gets request for pad as txt
-    var request = new XMLHttpRequest();
-    request.open("GET", pad, true);
-    request.send(null);
-    
-    request.onreadystatechange = function () {
-      if(request.readyState === XMLHttpRequest.DONE) {
-        //console.log("pad updated")
-        var returnValue = request.responseText;
-        // passes the text to be processed into obj
-        md2obj(returnValue);
-      }
-  }
-}
-
-
-function changeSection(){
-  let keys = Object.keys(obj);
-  numSections = keys.length;
-  secIndx++;
-  if(numSections<=secIndx){secIndx=0;}
-  section = keys[secIndx];
-
-}
-
-function isNumeric(num){
-  return !isNaN(num)
-}
-
-function callback(stream) {
-  var ctx = new AudioContext();
-  var mic = ctx.createMediaStreamSource(stream);
-  var analyser = ctx.createAnalyser();
-  mic.connect(analyser); 
-
-  var sampleBuffer = new Float32Array(analyser.fftSize);
-  var data = new Uint8Array(analyser.frequencyBinCount);
-
-  function play() {
-
-    /* analyser.getFloatTimeDomainData(sampleBuffer);
-
-    // Compute average power over the interval.
-    let sumOfSquares = 0;
-    for (let i = 0; i < sampleBuffer.length; i++) {
-      sumOfSquares += sampleBuffer[i] ** 2;
-    }
-    const avgPowerDecibels = 10 * Math.log10(sumOfSquares / sampleBuffer.length);
-
-    // Compute peak instantaneous power over the interval.
-    let peakInstantaneousPower = 0;
-    for (let i = 0; i < sampleBuffer.length; i++) {
-      const power = sampleBuffer[i] ** 2;
-      peakInstantaneousPower = Math.max(power, peakInstantaneousPower);
-    }
-    const peakInstantaneousPowerDecibels = 10 * Math.log10(peakInstantaneousPower);
-
-    console.log(peakInstantaneousPowerDecibels);
-    console.log(avgPowerDecibels); */
-    analyser.getByteFrequencyData(data);
-
-      // get fullest bin
-      var idx = 0;
-      for (var j=0; j < analyser.frequencyBinCount; j++) {
-          if (data[j] > data[idx]) {
-              idx = j;
-          }
-      }
-
-      frequency = idx * ctx.sampleRate / analyser.fftSize;
-
-      requestAnimationFrame(play);
-      if(frequency>4000 && !highGate){
-        mermaidDraw();
-        highGate = true;
-      }else if (frequency<4000) {
-        highGate = false;
-      }
-      if(frequency<3000 && !lowGate){
-        changeSection();
-        mermaidDraw();
-        lowGate = true;
-      }else if(frequency>3000){
-        lowGate = false;
-      }
+  getRandomNodeIndx(this_section) {
+    return Math.floor(Math.random() * this_section.steps.length);
   }
 
-  play();
+  randomHexColorCode = () => {
+    let n = (Math.random() * 0xfffff * 1000000).toString(16);
+    return '#' + n.slice(0, 6);
+  };
+
 
 }
-
-function showPad() {
-  var x = document.getElementById("pad");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-    eleM.style.height = '50%'
-  } else {
-    x.style.display = "none";
-    eleM.style.height = '100%'
-  }
-}
-
-function simple_thresholding(data, threshold){
-  let peaks = []
-  for ( let i=0; i< data.length - 1; i++){
-      if (data[i] > threshold && data[i] > data[i - 1] && data[i] > data[i + 1]){
-          peaks.push(i);
-      }
-  }
-  return peaks
-}
-
-function showError(){
-  //console.log(error)
-  if (error.length>0){
-
-    let ul  =document.createElement('ul');
-
-    // create elements
-    const elements = error.map(str => {
-    // create DOM element
-    const li = document.createElement("li");
-
-    // create text node containing the string
-    const textNode = document.createTextNode(str);
-    // append the text to the li
-    li.appendChild(textNode);
-    ul.appendChild(li);
-    
-    }); 
-
-  //   append the elements to the page
-  let errorWindow = document.getElementById("errorlist");
-  errorWindow.innerHTML = '';
-  errorWindow.appendChild(ul);
-  }
-}
-
-/* 
-
-function setup(){
-
-  mic = new p5.AudioIn();
-  fft = new p5.FFT();
-
-  highPeak = new p5.PeakDetect(9000, 20000, threshold, 20);
-  lowPeak = new p5.PeakDetect(20, 5000, threshold, 20);
-
-  mic.connect(fft);
-  //mic.connect(peak)
-  mic.start();
-  console.log(micLevel)
-
-}
-
-function draw(){
-
-  micLevel = mic.getLevel();
-  console.log(micLevel);
-  fft.analyze();
-  highPeak.update(fft);
-  lowPeak.update(fft);
-  
-  if(highPeak.isDetected){
-    mermaidDraw();
-  }else if(lowPeak.isDetected){
-    changeSection();
-  }
-
-} */
-  // formatting of text like this
-// "stateDiagram-v2\n    [*] --> Still\n    Still --> [*]\n    Still --> Moving\n    Moving --> Still\n    Moving --> Cash\n    Still --> Cash\n    Crash --> [*]"; 
-
-
-    //mermaidText += text[i] + " --> " + text[randI] + "\n    ";

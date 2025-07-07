@@ -1,173 +1,202 @@
-// obj to hold the pad info
-let obj = {};
-// indx to hold our place in the txt
-let indx = 0;
-//pad to hold the link to the pad
-let pad  = "https://pad.vvvvvvaria.org/visuals/export/txt";
+// md_obj to hold our mdOBJ class
+let md_obj;
+// merGraph to hold our obj2Mer class
+let merGraph;
 
-const interval = setInterval(function() {
+// Getting HTML elements we are adding to for the mermaid graph and errors.
+eleM = document.querySelector('.mermaid');
+eleE = document.querySelector('#err');
+
+//pad to hold the link to the pad - old - https://pad.vvvvvvaria.org/visuals
+
+//pad to hold the link to the Avalon pad - https://pad.vvvvvvaria.org/ether-vis
+let pad = "https://pad.vvvvvvaria.org/LCC-ether-vis/export/txt";
+
+// audio reactive settings . . . 
+var frequency = -1;
+let mic;
+let fft;
+let highPeak;
+let lowPeak;
+let highGate = false;
+let lowGate = false;
+let threshold = 0.02;
+let micLevel = -1;
+
+// start function initiates classes and gets pad data . . . 
+start();
+function start() {
+
+  merGraph = new obj2Mer();
+  md_obj = new mdObj();
   getPadData();
-  console.log("request pad");
-}, 10000);
 
-function setup() {
-  createCanvas(windowWidth, windowHeight*0.5);
 
-  // set pad url here (maybe in a ui though?). ad `/expot/txt` to get it as a txt file.
-    //<yourdomain>.com/p/<yourpad>/export/txt
-    //pad = "https://pad.vvvvvvaria.org/visuals/export/txt"
-    
-    // call the main pad text fetch + turn to object function
-    getPadData();
-    //console.log(obj);
-
-    // trying to get it to recursively update from the pad but no luck yet.<<<
-    //setInterval(getPadData, 500 );
-    
 }
 
-function draw() {
+// initiate mic input (calling callback function "audio_callback" at the bottom of this script)
+navigator.getUserMedia = navigator.getUserMedia
+  || navigator.webkitGetUserMedia
+  || navigator.mozGetUserMedia;
 
-  let stylingKeys = Object.keys(obj.section_2.styling);
-  let numKeys = stylingKeys.length;
-  
-  for (let k = 0; k < numKeys; k++) {
-    let key = stylingKeys[k];
-    if (window[key] !== undefined){
-      
-      window[key](obj.section_2.styling[key]);
-      console.log(key)
+navigator.getUserMedia({ video: false, audio: true }, audio_callback, console.log);
 
+// initiated pulling pad data every 35 seconds :)
+const interval = setInterval(function () {
+  getPadData();
+  showError();
+}, 35000);
+
+
+// main pad fetching function
+function getPadData() {
+
+  // gets request for pad as txt
+  var request = new XMLHttpRequest();
+  request.open("GET", pad, true);
+  request.send(null);
+
+  request.onreadystatechange = function () {
+    if (request.readyState === XMLHttpRequest.DONE) {
+      //console.log("pad updated")
+      var returnValue = request.responseText;
+      // passes the text to be processed into obj
+      md_obj.writeObj(returnValue);
+
+      //obj = md_obj.obj
+      //numSections = md_obj.numSections
     }
-
-    
-  }
-
-  window['textAlign'](CENTER);
-
-  text(obj.section_2.text[indx], width*0.5, height*0.5);
-  
-}
-
-// using mouse clicked to test index changing
-function mouseClicked() { 
-nxtIndx();
-} 
-
-// loops over the text indx
-function nxtIndx(){
-  indx++
-  if (obj.section_2.text.length<=indx){
-    indx=0;
   }
 }
 
-// randomly selects index
-function randIndx(){
-  indx= int(random(obj.section_2.text.length));
+// function to display errors we found :O
+function showError() {
+  //console.log(error)
+  if (md_obj.error.length > 0) {
+
+    let ul = document.createElement('ul');
+
+    // create elements
+    const elements = md_obj.error.map(str => {
+      // create DOM element
+      const li = document.createElement("li");
+
+      // create text node containing the string
+      const textNode = document.createTextNode(str);
+      // append the text to the li
+      li.appendChild(textNode);
+      ul.appendChild(li);
+
+    });
+
+    //   append the elements to the page
+    let errorWindow = document.getElementById("errorlist");
+    errorWindow.innerHTML = '';
+    errorWindow.appendChild(ul);
+  }
 }
 
-// main fetching function
-function getPadData()
-{
-    // gets request for pad as txt
-    var request = new XMLHttpRequest();
-    request.open("GET", pad, false);
-    request.send(null);
-    var returnValue = request.responseText;
 
-    // passes the text to be processed into obj
-    md2obj(returnValue);
+// main function called by button 
+async function mermaidDraw() {
+
+  merGraph.setObj(md_obj.getThisSectionObj(), md_obj.get_section());
+  let rotation = (eleM.offsetWidth > eleM.offsetHeight);
+  let result_graph = await merGraph.GenGraph(rotation);
+
+  if (typeof result_graph === 'object' && !Array.isArray(result_graph) && result_graph !== null) {
+    //console.log(result_graph.svg);
+    eleM.setAttribute("alt", result_graph.alt_description);
+    eleM.innerHTML = result_graph.svg;
+  }
 
 }
 
-function md2obj(md)
-{
-  // splits the md file into lines
-  md = md.match(/(#+.*)|([^!?;.\n]+.)/g).map(v=>v.trim());
-  // var to keep track of heading level
-  let headingLvl = 0;
-  // array to keep a list of current heading hierarchies
-  let headings = [];
 
-  //loop over md file lines
-  md.forEach(mdDoc => {
-    // if blank return
-    if (mdDoc === "") {return}
+// changes section(h1) in pad obj
+function changeSection() {
 
-    // check the num of hashes in title
-    let numHashes = (mdDoc.split("#").length - 1)
-    // if num # is greater than 0 (its a heading)
-    if(numHashes>0){
-     sort_Headings(mdDoc);
+  md_obj.changeSection();
+
+}
+
+// show and hide pad
+function showPad() {
+  var x = document.getElementById("pad");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    eleM.style.height = '50%'
+  } else {
+    x.style.display = "none";
+    eleM.style.height = '100%'
+  }
+}
+
+// function for audio callback
+function audio_callback(stream) {
+
+  // very basic audio frequency change algo probs needs changing . . . .
+  var ctx = new AudioContext();
+  var mic = ctx.createMediaStreamSource(stream);
+  var analyser = ctx.createAnalyser();
+  mic.connect(analyser);
+
+  var sampleBuffer = new Float32Array(analyser.fftSize);
+  var data = new Uint8Array(analyser.frequencyBinCount);
+
+  function play() {
+
+    /* 
+    old bits on audio sensing I kept for some reason?
+
+    analyser.getFloatTimeDomainData(sampleBuffer);
+
+    // Compute average power over the interval.
+    let sumOfSquares = 0;
+    for (let i = 0; i < sampleBuffer.length; i++) {
+      sumOfSquares += sampleBuffer[i] ** 2;
     }
-    else{ // it is a value and we add it to the obj
-      add_data(obj)
+    const avgPowerDecibels = 10 * Math.log10(sumOfSquares / sampleBuffer.length);
+
+    // Compute peak instantaneous power over the interval.
+    let peakInstantaneousPower = 0;
+    for (let i = 0; i < sampleBuffer.length; i++) {
+      const power = sampleBuffer[i] ** 2;
+      peakInstantaneousPower = Math.max(power, peakInstantaneousPower);
     }
-    
-  });
+    const peakInstantaneousPowerDecibels = 10 * Math.log10(peakInstantaneousPower);
 
-}
+    console.log(peakInstantaneousPowerDecibels);
+    console.log(avgPowerDecibels); */
+    analyser.getByteFrequencyData(data);
 
-function sort_Headings(mdDoc) {
-   // clean up title by removing #, making lower case and replacing spaces with _
-   mdDoc = mdDoc.split('#').join('').trim().toLowerCase().split(' ').join('_');
-   // three if statements to see if headings have changed, going higher, staying the same, or dropping back a level
-   if(headingLvl<numHashes){
-     // adds a level
-     headingLvl++;
-     // add name of heading to list
-     headings.push(mdDoc);
-   }
-   else if(headingLvl==numHashes){
-     // change name of last heading in the list
-     headings[headings.length - 1] = mdDoc
-   }
-   else if (headingLvl>=numHashes){
-     // go back a level of heading
-     headingLvl--;
-     // remove a vlue from the list
-     headings.pop();
-     // replace the last heading in the list
-     headings[headings.length - 1] = mdDoc
-
-   }
-}
-
-function add_data(thisData){
-      // loop over the current heading level
-      for (let h = 0; h < headings.length; h++) {
-
-        if (h==headings.length-1){ // if it is the last heading in the list add the data
-          if(headings[h] == 'styling'){ // if heading is styling
-            // make an object if it doesn't exist
-            if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
-            // split the data by the colon :
-            mdDoc = mdDoc.split(':');
-
-            let func = mdDoc[0].trim;
-            let val = mdDoc[1].trim;
-
-            if (isNumeric(val)){val = int(val);}
-            // set the key and value from the two pairs.
-            thisData[headings[h]][func] = val;
-          }
-          else{
-            // for unlabled create a list if not there
-            if(!(headings[h]in thisData)){thisData[headings[h]] = [];}
-            // and add the value to it.
-            thisData[headings[h]].push(mdDoc);
-          }
-        }
-        else{// else go into that next layer of the obj
-          // if the next layer doesn't exist make it
-          if(!(headings[h]in thisData)){thisData[headings[h]] = {};}
-          // move thisData into it.
-          thisData = thisData[headings[h]];
-        }
+    // get fullest bin
+    var idx = 0;
+    for (var j = 0; j < analyser.frequencyBinCount; j++) {
+      if (data[j] > data[idx]) {
+        idx = j;
       }
+    }
+
+    frequency = idx * ctx.sampleRate / analyser.fftSize;
+
+    requestAnimationFrame(play);
+    if (frequency > 4000 && !highGate) {
+      mermaidDraw();
+      highGate = true;
+    } else if (frequency < 4000) {
+      highGate = false;
+    }
+    if (frequency < 3000 && !lowGate) {
+      changeSection();
+      mermaidDraw();
+      lowGate = true;
+    } else if (frequency > 3000) {
+      lowGate = false;
+    }
+  }
+
+  play();
+
 }
 
-function isNumeric(num){
-  return !isNaN(num)
-}
