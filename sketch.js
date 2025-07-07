@@ -23,9 +23,11 @@ let lowGate = false;
 let threshold = 0.02;
 let micLevel = -1;
 
+let init = true;
+
 // start function initiates classes and gets pad data . . . 
 start();
-function start() {
+async function start() {
 
   merGraph = new obj2Mer();
   md_obj = new mdObj();
@@ -63,8 +65,10 @@ function getPadData() {
       // passes the text to be processed into obj
       md_obj.writeObj(returnValue);
 
-      //obj = md_obj.obj
-      //numSections = md_obj.numSections
+      if(init==true){
+        init = false;
+        changeSection();
+      }
     }
   }
 }
