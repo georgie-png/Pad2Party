@@ -4,7 +4,7 @@
 
 A fun bit of code that turns pads into mermaid graphs. This is still an early messy edition, and will be updated when we have more time . . . . to be more user friendly/customisable.
 
-For now, do test it out live [HERE](https://georgie-png.github.io/etherpad-vis/)
+For now, do test it out live [HERE](https://georgie-png.github.io/Pad2Party/)
 
 ## ToDos
 - [X] Making styling dynamic
