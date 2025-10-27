@@ -2,15 +2,12 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
 
   </head>
   <body>
     <div class="topnav">
-      <button onclick="changeSection(); mermaidDraw()">next graph</button>
       <button onclick="mermaidDraw()">randomise graph</button>
-      <button onclick="showPad()">show/ hide pad</button>
-      <button onclick="window.dialog.showModal();">error debugging 🔧</button>
       <dialog id="dialog">
         <p>🐛 Hi There! There are errors in section</p>
         <p id="errorlist"></p>
@@ -20,12 +17,9 @@
       </dialog>
     </div>
         <div class="mermaid split top"></div>
-      <div  id="pad" class="split bottom">
-        <iframe name="embed_readwrite" src="https://pad.vvvvvvaria.org/LCC-ether-vis?showControls=true&showChat=true&showLineNumbers=true&useMonospaceFont=false" width="100%" height="100%" frameborder="0"></iframe>      </div>
-    </div>
+
     <pre id="err"></pre>
     <script src="mermaid.js">  </script>
-    <script src="mdObj.js">  </script>
     <script src="sketch.js">  </script>
 
 
