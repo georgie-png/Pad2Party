@@ -20,22 +20,21 @@ function start() {
   graphName = ""
   obj =   {
                   "steps": [
-                    {"label":"Wiggle Room", "img":"https://georgie-png.github.io/Portfolio/media/icons/configure-able.svg", "url": "glossary.html"},
-                    {"label":"affirmation", "img":"https://georgie-png.github.io/Portfolio/media/icons/cozy.svg", "url": "glossary.html"},
-                    {"label":"backgrounds", "img":"https://georgie-png.github.io/Portfolio/media/icons/background.svg", "url": "glossary.html"},
-                    {"label":"feel out", "img":"https://georgie-png.github.io/Portfolio/media/icons/in-configure.svg", "url": "glossary.html"},
-                    {"label":"make sense", "img":"https://georgie-png.github.io/Portfolio/media/icons/knowledge-graph.svg", "url": "glossary.html"},
-                    {"label":"tables", "img":"https://georgie-png.github.io/Portfolio/media/icons/layers.svg", "url": "glossary.html"},
-                  ],
+                    {"label":"DDcommons", "img":"https://wiki.ddcommons.net/images/f/f1/DDcommons_icon_lino.png", "url": "glossary.html"},
+                    {"label":"Permacomputing", "img":"https://permacomputing.net/pmclogo-neau.png", "url": "glossary.html"},
+                    {"label":"In-grid", "img":"https://wiki.ddcommons.net/images/4/44/In-grid.png", "url": "glossary.html"},
+                    {"label":"Deep Coded Changes", "url": "glossary.html"},
+                ],
                   "movements": [
-                    "cripping",
-                    "slow",
-                    "misfit",
-                    "deviate",
+                    "mutual aid",
+                    "skills",
+                    "infrastructures",
+                    "affirmation",
                     "shape",
                     "friction",
-                    "hold",
                     "care",
+                    "justice",
+                    "misfitting"
                   ]
               }
 
@@ -55,7 +54,7 @@ async function mermaidDraw() {
   shuffle(obj.steps)
   merGraph.setObj(obj, graphName);
   let rotation = (eleM.offsetWidth > eleM.offsetHeight);
-  let labels = false;
+  let labels = true;
   let result_graph = await merGraph.GenGraph( rotation, labels );
 
   if (typeof result_graph === 'object' && !Array.isArray(result_graph) && result_graph !== null) {
