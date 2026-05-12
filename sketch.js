@@ -21,7 +21,7 @@ function start() {
   obj =   {
                   "steps": [
                     {"label":"DDcommons", "img":"https://wiki.ddcommons.net/images/f/f1/DDcommons_icon_lino.png", "url": "glossary.html"},
-                    {"label":"Permacomputing", "img":"https://permacomputing.net/pmclogo-neau.png", "url": "glossary.html"},
+                    {"label":"Permacomputing", "img":"https://wiki.ddcommons.net/images/8/86/Pmclogo-neau.png", "url": "glossary.html"},
                     {"label":"In-grid", "img":"https://wiki.ddcommons.net/images/4/44/In-grid.png", "url": "glossary.html"},
                     {"label":"Deep Coded Changes", "url": "glossary.html"},
                 ],

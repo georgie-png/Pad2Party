@@ -62,7 +62,7 @@ class obj2Mer {
 
         }
         if(label===true){
-          graphText+= `label: '<h3>` + item.label + "</h3>";
+          graphText+= ` label: '<h3>` + item.label + "</h3>";
         }
         
         graphText  += "', h: 80, constraint: 'on' }" + "\n ";
